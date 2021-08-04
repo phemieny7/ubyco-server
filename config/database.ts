@@ -6,12 +6,6 @@
  */
 
 import Env from '@ioc:Adonis/Core/Env'
-import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
-import Application from '@ioc:Adonis/Core/Application'
-
-import Url from 'url-parse'
-const CLEARDB_DATABASE_URL = new Url(Env.get(‘CLEARDB_DATABASE_URL’))
-
 
 const databaseConfig: DatabaseConfig = {
   /*
@@ -24,8 +18,8 @@ const databaseConfig: DatabaseConfig = {
   | file.
   |
   */
-  // connection: Env.get('DB_CONNECTION'),
-  connection: Application.inDev ? Env.get('DB_CONNECTION') : 'pgs'
+  connection: Env.get('DB_CONNECTION'),
+
   connections: {
     /*
     |--------------------------------------------------------------------------
@@ -41,11 +35,11 @@ const databaseConfig: DatabaseConfig = {
     pg: {
       client: 'pg',
       connection: {
-        host: CLEARDB_DATABASE_URL.host as string,
-        port: Number(''),
-        user: CLEARDB_DATABASE_URL.username as string,
-        password: CLEARDB_DATABASE_URL.password as string,
-        database: CLEARDB_DATABASE_URL.pathname.substr(1) as string
+        host: Env.get('PG_HOST'),
+        port: Env.get('PG_PORT'),
+        user: Env.get('PG_USER'),
+        password: Env.get('PG_PASSWORD', ''),
+        database: Env.get('PG_DB_NAME'),
       },
       migrations: {
         naturalSort: false,

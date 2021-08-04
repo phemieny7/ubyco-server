@@ -11,7 +11,7 @@ export default class CardTransactions extends BaseSchema {
       table.string('rate').notNullable()
       table.string('amount').notNullable()
       table.text('comments')
-      table.json('cards')
+      table.string('cards')
       table.boolean('completed').defaultTo(false)
       table.integer('status').references('statuses.id').defaultTo(1)
       
