@@ -29,8 +29,5 @@
     "source-map-support": "^0.5.19",
     "twilio": "^3.66.0",
     "url-parse": "^1.5.3"
-  },
-  "engines": {
-    "node": "12.18.3"
   }
 }
