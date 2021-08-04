@@ -14,6 +14,7 @@ export default class UsersSchema extends BaseSchema {
       table.string('picture')
       table.boolean('banned').defaultTo(false)
       table.string('customer_id')
+      table.integer('role_id').defaultTo(1)
       table.boolean('is_verified').defaultTo(false)
       table.string('verification_code').nullable()
       table.string('remember_me_token').nullable()

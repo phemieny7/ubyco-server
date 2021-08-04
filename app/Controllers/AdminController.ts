@@ -3,7 +3,7 @@ import  User from 'App/Models/User'
 import CardTransaction from 'App/Models/CardTransaction'
 import CoinTransaction from 'App/Models/CoinTransaction'
 import UserAmount from 'App/Models/UserAmount'
-import UserAccount from 'App/Models/UserAccount'
+// import UserAccount from 'App/Models/UserAccount'
 import Status from 'App/Models/Status'
 
 
@@ -33,7 +33,7 @@ export default class AdminsController {
                 loader.load('coinTransaction')
                 .load('transaction')
                 .load('userAccounts')
-                .load('wallet')
+                .load('userAmount')
               })
               
             return response.send({message: user})
@@ -100,15 +100,14 @@ export default class AdminsController {
             if(status?.name !== 'completed'){
                 return response.status(403).send({message: "Kind update the status of this transaction to completed" })
             }
+            
             if(transaction?.completed === true){
                 return response.status(403).send({message: "This transaction has been paid out" })
             }
             transaction.completed = true
             const pre = Number(wallet?.amount)         
             const value = Number(transaction.$attributes.rate * transaction.$attributes.amount + pre)
-            await wallet
-            .merge({ amount: value})
-            .save()
+            await wallet?.merge({ amount: String(value)}).save()
             transaction?.save()
             
             return response.send({message: transaction})

@@ -14,7 +14,6 @@ export default class CardTransactions extends BaseSchema {
       table.string('cards')
       table.boolean('completed').defaultTo(false)
       table.integer('status').references('statuses.id').defaultTo(1)
-      
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
