@@ -42,6 +42,9 @@ export default class CardTransaction extends BaseModel {
   public status: number
 
   @column()
+  public total: number
+
+  @column()
   public completed: boolean
 
   @column.dateTime({ autoCreate: true })
@@ -50,20 +53,24 @@ export default class CardTransaction extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
+  
   @belongsTo(()=>CardType, {
     foreignKey: 'card_type_id'
   })
   public card: BelongsTo<typeof CardType>
+
 
   @belongsTo(()=>Status, {
     foreignKey: 'status'
   })
   public status_name: BelongsTo<typeof Status>
 
+
   @belongsTo(() => User, {
     foreignKey: 'user_id'
   })
   public user: BelongsTo<typeof User>
+
 
   @hasOne(() => UserAccount, {
     foreignKey: 'user_id'

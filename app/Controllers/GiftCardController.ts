@@ -31,7 +31,6 @@ export default class GiftCardsController {
       });
 
       for (let card of cards) {
-        //   console.log(card.extname)
         await card.move(Application.tmpPath("uploads/cards"), {
           name: `${cuid()}.${card.extname}`,
         });
@@ -41,8 +40,6 @@ export default class GiftCardsController {
       for (let i = 0; i < cards.length; i++) {
         name.push(cards[i].fileName);
       }
-
-  
       
       const transaction = new CardTransaction();
       transaction.user_id = user.id,
@@ -50,9 +47,10 @@ export default class GiftCardsController {
       transaction.rate = payload.rate,
       transaction.amount = payload.amount,
       transaction.comments = payload.comment,
-      transaction.cards = name
+      transaction.cards = name,
+      transaction.total = Number(payload.amount) * Number(payload.rate)
       transaction.save();
-      return response.status({ message: transaction });
+      return response.status(200);
     } catch (error) {
       console.log(error);
     }

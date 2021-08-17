@@ -18,7 +18,6 @@ export default class UsersController {
             await user?.load('userAmount')
            return response.send({message: user})
         } catch (error) {
-            console.log(error)
             return response.badRequest({error})
         }  
     }

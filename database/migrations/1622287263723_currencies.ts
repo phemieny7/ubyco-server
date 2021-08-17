@@ -8,7 +8,6 @@ export default class Currencies extends BaseSchema {
       table.increments('id')
       table.string('name')
       table.string('symbol')
-      
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

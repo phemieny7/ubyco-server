@@ -8,6 +8,7 @@ export default class Coins extends BaseSchema {
       table.increments('id')
       table.string('name')
       table.string('rate')
+      table.string('image')
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL
        */

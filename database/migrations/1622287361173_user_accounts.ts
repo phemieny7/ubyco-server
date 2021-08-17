@@ -9,8 +9,8 @@ export default class UserAccounts extends BaseSchema {
       table.integer('user_id').references('users.id')
       table.integer('bank_code')
       table.string('account_number')
+      table.string('bank')
       table.string('account_name')
-      
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

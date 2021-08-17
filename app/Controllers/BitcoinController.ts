@@ -49,6 +49,7 @@ export default class BitcoinsController {
         rate,
         total: Number(payload.amount * rate),
       });
+
       return response.send({ message: transaction });
     } catch (error) {
       console.log(error);

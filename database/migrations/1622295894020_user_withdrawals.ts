@@ -9,6 +9,7 @@ export default class UserWithdrawals extends BaseSchema {
       table.integer('user_id').references('users.id')
       table.string('amount')
       table.string('receipt')
+      table.integer('account_id').references('user_accounts.id')
       table.boolean('completed').defaultTo(false)
       table.integer('status').references('statuses.id').defaultTo(1)
       table.timestamp('created_at', { useTz: true })

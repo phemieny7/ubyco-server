@@ -9,7 +9,7 @@ export default class CoinTransactions extends BaseSchema {
       table.integer('user_id').references('users.id')
       table.integer('coin_id').references('coins.id')
       table.string('amount').notNullable()
-      table.string('total').notNullable
+      table.integer('total').notNullable
       table.text('comments')
       table.string('rate').notNullable()
       table.string('receipt')

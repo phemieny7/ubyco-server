@@ -8,7 +8,6 @@ export default class UserAmounts extends BaseSchema {
       table.increments('id')
       table.integer('user_id').references('users.id')
       table.string('amount')
-      
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

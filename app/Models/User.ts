@@ -16,6 +16,7 @@ import UserAmount from 'App/Models/UserAmount'
 import CardTransaction from 'App/Models/CardTransaction'
 import CoinTransaction from 'App/Models/CoinTransaction'
 import Role from 'App/Models/Role'
+import UserWithdrawal from 'App/Models/UserWithdrawal'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -82,13 +83,19 @@ export default class User extends BaseModel {
   @hasMany(()=>CardTransaction, {
     foreignKey: 'user_id'
   })
-  public transaction: HasMany<typeof CardTransaction>
+  public cardTransaction: HasMany<typeof CardTransaction>
 
 
   @hasMany(()=>CoinTransaction, {
     foreignKey: 'user_id'
   })
   public coinTransaction: HasMany<typeof CoinTransaction>
+
+
+  @hasMany(()=>UserWithdrawal, {
+    foreignKey: 'user_id'
+  })
+  public userWithdrawal: HasMany<typeof UserWithdrawal>
 
 
   @belongsTo(() => Role, {

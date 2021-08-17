@@ -47,8 +47,10 @@ export default class AuthController {
         (user.password = payload.password),
         (user.verification_code = verification_code);
       await user.save();
+      console.log(user)
       return response.status(200);
     } catch (error) {
+      console.log(error)
       return response.badRequest(error.messages);
     }
   }
