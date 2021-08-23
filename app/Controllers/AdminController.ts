@@ -4,10 +4,16 @@ import CardTransaction from "App/Models/CardTransaction";
 import CoinTransaction from "App/Models/CoinTransaction";
 import UserAmount from "App/Models/UserAmount";
 import CardType from "App/Models/CardType";
-import Coin from "App/Models/Coin"
+import Card from "App/Models/Card";
+
+import Coin from "App/Models/Coin";
 // import UserAccount from 'App/Models/UserAccount'
 import Status from "App/Models/Status";
+import UserWithdrawal from "App/Models/UserWithdrawal";
 import Database from "@ioc:Adonis/Lucid/Database";
+import * as Helper from "../common";
+
+import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
 
 
 export default class AdminsController {
@@ -19,76 +25,72 @@ export default class AdminsController {
   //all User
   public async allUser({ response }) {
     try {
-      const user =  await User
-      .query()
-      .preload('userAmount')
+      const user = await User.query().preload("userAmount");
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
     }
   }
 
-   //single User
-   public async user({ response, params }) {
+  //single User
+  public async user({ response, params }) {
     try {
-      const id = params.id
-      const user =  await User.find(id)
+      const id = params.id;
+      const user = await User.find(id);
       await user?.load((loader) => {
-        loader.load('userAmount')
-        .load('userAmount')
-        .load('userAccounts')
-        .load('coinTransaction')
-        .load('cardTransaction')
-        .load('userWithdrawal')
-      })
+        loader
+          .load("userAmount")
+          .load("userAmount")
+          .load("userAccounts")
+          .load("coinTransaction")
+          .load("cardTransaction")
+          .load("userWithdrawal");
+      });
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
     }
   }
-
 
   //change user status
-  public async userStatus({ params, response }) {
+  public async userStatus({ request, response }) {
     try {
-      // console.log(request)
-      const id = params.id
-      console.log(id)
-      const user =  await User.find(id);
-      !user?.banned
-      user?.save()
-      return response.send({ message: user });
+      const data = request.body();
+      const id = data.id;
+      const status = data.status;
+      const user = await User.findOrFail(id);
+      user.banned = status;
+      user?.save();
+      return response.send(user);
     } catch (error) {
-      console.log(error)
       return response.badRequest(error);
     }
   }
 
- 
-
+  //calculate revenue of both cards and coin transaction
   public async revenue({ response }) {
     try {
-      const card = await Database
-      .from('card_transactions')
-      .where('status', 4)
-      .sum('total')
+      const card = await Database.from("card_transactions")
+        .where("status", 4)
+        .sum("total");
 
-      const coin = await Database
-      .from('coin_transactions')
-      .where('status', 4)
-      .sum('total')
-      
-      const total_array = coin.concat(card) 
-      const total = total_array.reduce((accum, item) => accum + Number(item.sum), 0)
-      
-     
+      const coin = await Database.from("coin_transactions")
+        .where("status", 4)
+        .sum("total");
+
+      const total_array = coin.concat(card);
+      const total = total_array.reduce(
+        (accum, item) => accum + Number(item.sum),
+        0
+      );
+
       return response.send({ message: total });
-      
     } catch (error) {
       return response.badRequest(error);
     }
   }
 
+  //pending transaction count
   public async pending({ response }) {
     try {
       const pending_card = await Database.rawQuery(
@@ -101,17 +103,17 @@ export default class AdminsController {
       );
 
       const total = pending_card.rowCount + pending_coin.rowCount;
-      if (total > 0){
+      if (total > 0) {
         return response.send({ message: total });
-      }else{
+      } else {
         return response.send({ message: 0 });
       }
-      
     } catch (error) {
       return response.badRequest(error);
     }
   }
 
+  //weekly transaction calculation
   public async weeklyCardExchange({ response }) {
     try {
       const weeklyCard = await Database.rawQuery(
@@ -124,57 +126,131 @@ export default class AdminsController {
     }
   }
 
-  //get card rate
-  public async getCardRate({response}){
+  //create cards
+  public async card({request, response}){
+    const data = schema.create({
+      name: schema.string({}, [rules.required()]),
+    });
     try {
-      const data = await CardType.all()
-      return response.send({message: data})
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const card = new Card()
+      card.name = payload.name,
+      card.save()
+      return response.send(card)
     } catch (error) {
-      return error.response.send({message: 'something went wrong'})
+      console.log(error)
+      return response.badRequest(error);
     }
   }
 
-  public async getCoinRate({response}){
+  //update cards
+  public async updateCard({request, response}){
+    const data = schema.create({
+      name: schema.string({}, [rules.required()]),
+      id: schema.number([rules.required()]),
+    });
     try {
-      const data = await Coin.all()
-      return response.send({message: data})
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const card = await Card.findByOrFail('id', payload.id)
+      card.name = payload.name
+      card.save()
+      return response.send(card)
     } catch (error) {
-      return error.response.send({message: 'something went wrong'})
+      console.log(error)
+      return response.badRequest(error);
+    }
+  }
+
+   //delete cards
+   public async deleteCard({request, response}){
+    const data = schema.create({
+      id: schema.number([rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const card = await Card.findByOrFail('id', payload.id)
+     
+      return response.send(card)
+    } catch (error) {
+      console.log(error)
+      return response.badRequest(error);
+    }
+  }
+
+  // fetch cards and children rate
+  public async cardRate({ response }) {
+    try {
+      const data = await Card.query().preload("cardTypes");
+      return response.send({ message: data });
+    } catch (error) {
+      return error.response.send({ message: "something went wrong" });
+    }
+  }
+
+  //get card rate
+  public async getCardRate({ response }) {
+    try {
+      const data = await CardType.query().preload("card");
+      return response.send({ message: data });
+    } catch (error) {
+      return error.response.send({ message: "something went wrong" });
+    }
+  }
+  //get coin rate
+  public async getCoinRate({ response }) {
+    try {
+      const data = await Coin.all();
+      return response.send({ message: data });
+    } catch (error) {
+      return error.response.send({ message: "something went wrong" });
     }
   }
 
   //get all card transactions
-  public async getCardsTransactions({response}) {
+  public async getCardsTransactions({ response }) {
     try {
-      const transactions = await CardTransaction
-      .query()
-      .preload('status_name')
-      .preload('card')
-      .preload('user')
+      const transactions = await CardTransaction.query()
+        .preload("status_name")
+        .preload("card")
+        .preload("user");
       // console.log(transactions)
       return response.send({ message: transactions });
-    }catch(error) {
+    } catch (error) {
       return response.badRequest(error);
     }
   }
 
-   //get all card transactions
-   public async getCoinsTransactions({response}) {
+  //get all coin transactions
+  public async getCoinsTransactions({ response }) {
     try {
-      const transactions = await CoinTransaction
-      .query()
-      .preload('status_name')
-      .preload('coin')
-      .preload('user')
+      const transactions = await CoinTransaction.query()
+        .preload("status_name")
+        .preload("coin")
+        .preload("user");
       // console.log(transactions)
       return response.send({ message: transactions });
-    }catch(error) {
+    } catch (error) {
       return response.badRequest(error);
     }
   }
 
-   //get single card transaction
-   public async getCoin({ params, response }) {
+  //get single coin transaction
+  public async getCoin({ params, response }) {
     try {
       const transaction = await CoinTransaction.findBy("id", params.id);
       await transaction?.load((loader) => {
@@ -219,11 +295,9 @@ export default class AdminsController {
       const wallet = await UserAmount.findBy("user_id", transaction.user_id);
 
       if (status?.name !== "completed") {
-        return response
-          .status(403)
-          .send({
-            message: "Kind update the status of this transaction to completed",
-          });
+        return response.status(403).send({
+          message: "Kind update the status of this transaction to completed",
+        });
       }
 
       if (transaction?.completed === true) {
@@ -246,18 +320,6 @@ export default class AdminsController {
     }
   }
 
-  //get all coin transactions
-  public async getCoinTransactions({ response }) {
-    try {
-      const transactions = await CoinTransaction.all();
-      transactions.forEach((transaction) => {
-        transaction?.load((loader) => {
-          loader.load("coin").load("status_name").load("user");
-        });
-      });
-      return response.send({ message: transactions });
-    } catch (error) {}
-  }
 
   //get all user Amount
   public async userWallet({ response }) {
@@ -272,5 +334,46 @@ export default class AdminsController {
     } catch (error) {
       return response.badRequest(error);
     }
+  }
+
+  public async allWithdrawal({ response }) {
+    try {
+      const allWithdrawals = await UserWithdrawal.query()
+        .preload("user")
+        .preload("status_name")
+        .preload("userAmount");
+      return response.send({ message: allWithdrawals });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  public async userWithdrawal({ response, params }) {
+    try {
+      const withdrawal = await UserWithdrawal.findByOrFail("id", params.id);
+      await withdrawal?.load((loader) => {
+        loader
+          .load("account")
+          .load("status_name")
+          .load("user")
+          .load("userAmount");
+      });
+      return response.send({ message: withdrawal });
+    } catch (error) {
+      console.log(error);
+      return response.send({ message: "Not Found" });
+    }
+  }
+
+  public async initiateWithdrawal({ request, response }) {
+    try {
+      const { email, customer_id, amount, bank_code, account_number } = request;
+      const initializePayment = await Helper.paystack.initializeTransaction({
+        reference: "7PVGX8MEk85tgeEpVDtD",
+        amount: Number(amount) * 100, // 5,000 Naira (remember you have to pass amount in kobo)
+        email: email,
+        subaccount: customer_id,
+      });
+    } catch (error) {}
   }
 }

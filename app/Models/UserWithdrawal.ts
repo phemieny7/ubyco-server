@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, BelongsTo, belongsTo } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, BelongsTo, belongsTo, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
 
 import User from 'App/Models/User'
+import UserAmount from 'App/Models/UserAmount'
+import Status from 'App/Models/Status'
+import UserAccount from './UserAccount'
 export default class UserWithdrawal extends BaseModel {
   @column({ isPrimary: true })
   public id: number
@@ -22,6 +25,9 @@ export default class UserWithdrawal extends BaseModel {
   public status: number
 
   @column()
+  public account_id: number
+
+  @column()
   public receipt: string
 
   @column.dateTime({ autoCreate: true })
@@ -35,4 +41,20 @@ export default class UserWithdrawal extends BaseModel {
     foreignKey: 'user_id'
   })
   public user: BelongsTo<typeof User>
+
+  @hasOne(() => UserAmount, {
+    foreignKey: 'user_id'
+  })
+  public userAmount: HasOne<typeof UserAmount>
+
+  @belongsTo(()=>Status, {
+    foreignKey: 'status'
+  })
+  public status_name: BelongsTo<typeof Status>
+
+  @belongsTo(()=> UserAccount, {
+    foreignKey: 'account_id'
+  })
+  public account: BelongsTo<typeof UserAccount>
+
 }

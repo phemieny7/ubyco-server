@@ -22,6 +22,8 @@ export default class CardType extends BaseModel {
   public updatedAt: DateTime
 
 
-  @belongsTo(() => Card)
+  @belongsTo(() => Card, {
+    foreignKey: 'card_id'
+  })
   public card: BelongsTo<typeof Card>
 }

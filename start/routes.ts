@@ -21,18 +21,16 @@
 // import { Router } from '@adonisjs/http-server/build/standalone'
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', () => {
-    return 'Hello world'
-  });
-
 //Authentication / General route
 Route.post('register', 'AuthController.register')
 Route.put('verify', 'AuthController.verify')
 Route.post('login', 'AuthController.login')
 Route.post('logout', 'AuthController.logout')
 Route.put('forget', 'AuthController.forget')
-// Route.get('/', 'AuthController.index').middleware('auth')
+Route.get('/', 'AuthController.index').middleware('auth')
 Route.get('/list-banks', 'UserController.listBanks')
+Route.get('/get-picture/:folder/:filename', 'UserController.getPicture')
+
 
 // user route
 Route.group(() => {
@@ -41,7 +39,6 @@ Route.group(() => {
     Route.get('/get-account', 'UserController.getAccount')
     Route.get('/get-account-name', 'UserController.getAccountName')
     Route.post('/add-account', 'UserController.addAccount')
-    Route.get('/get-picture', 'UserController.getPicture')
     Route.get('/card', 'UserController.card')
     Route.get('/card-type', 'UserController.cardType')
     Route.get('/coin', 'UserController.coin')
@@ -71,10 +68,16 @@ Route.group(() => {
     Route.get('/pending-trade', 'AdminController.pending')
     Route.get('/weekly-card-exchange', 'AdminController.weeklyCardExchange')
     Route.get('/user/:id', 'AdminController.user')
+    Route.get('/card_brand', 'UserController.card')
     Route.get('/card_rate', 'AdminController.getCardRate')
     Route.get('/coin_rate', 'AdminController.getCoinRate')
-    Route.put('/user_status/:id', 'AdminController.userStatus')
+    Route.put('/user_status', 'AdminController.userStatus')
     Route.get('/card', 'AdminController.getCardsTransactions')
+    Route.get('/all_card', 'AdminController.cardRate')
+    Route.post('/create_card', 'AdminController.card')
+    Route.put('/update_card', 'AdminController.updateCard')
+    Route.delete('/delete_card', 'AdminController.deleteCard')
+
     Route.get('/card/:id', 'AdminController.getCard')
     Route.put('/card/:id', 'AdminController.updateCardStatus')
     Route.put('/confirm-card/:id', 'AdminController.confirmCardTransaction')
@@ -82,4 +85,6 @@ Route.group(() => {
     Route.get('/coin/:id', 'AdminController.getCoin')
     Route.put('/coin/:id', 'AdminController.updateCoinStatus')
     Route.put('/confirm-coin/:id', 'AdminController.confirmCoinTransaction')
+    Route.get('/withdrawal', 'AdminController.allWithdrawal')
+    Route.get('/withdrawal/:id', 'AdminController.userWithdrawal')
 }).prefix('/admin').middleware(['auth', 'admin'])

@@ -26,7 +26,6 @@ export default class Card extends BaseModel {
   @hasMany(() => CardType, {
     foreignKey: 'card_id'
   })
-  
   public cardTypes: HasMany<typeof CardType>
 
 }

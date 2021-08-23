@@ -103,4 +103,5 @@ export default class User extends BaseModel {
   })
   public role: BelongsTo<typeof Role>
 
+  
 }

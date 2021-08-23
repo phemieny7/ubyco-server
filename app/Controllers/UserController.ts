@@ -84,10 +84,12 @@ export default class UsersController {
         } 
     }
 
-    public async getPicture({auth, response}){
+    public async getPicture({params, response}){
         try{
-            const user = auth.user
-            return response.status(200).attachment(Application.tmpPath('uploads/profiles', user.picture)) 
+            return response.attachment(
+                Application.tmpPath(`uploads/${params.folder}`, params.filename)
+              )
+            
         } catch (error) {
             return response.badRequest({error})
         }
@@ -146,7 +148,8 @@ export default class UsersController {
 
     public async card({response}){
         try {
-            const card = await Card.all()
+            const card = await Card.query()
+            .preload("cardTypes")
             return response.send({message: card})
         } catch (error) {
             return response.badRequest(error)

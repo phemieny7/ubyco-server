@@ -135,7 +135,7 @@ export default class AuthController {
         .attempt(payload.email, payload.password, {
           expiresIn: "7days",
         });
-      return response.status(200).send({ message: token });
+      return response.status(200).send({ message: token , user });
     } catch (error) {
       return response.badRequest(error);
     }
