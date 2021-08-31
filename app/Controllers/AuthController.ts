@@ -76,7 +76,7 @@ export default class AuthController {
         let name = user.fullname.split(" ");
 
         //create user as a paystack customer
-        const createCustomer = await Helper.paystack.createCustomer({
+        const createCustomer = await Helper.paystack.customer.create({
           first_name: name[0],
           last_name: name[1],
           email: user.email,

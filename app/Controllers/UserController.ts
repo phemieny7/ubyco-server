@@ -103,7 +103,6 @@ export default class UsersController {
          } catch (error) {
              return response.badRequest(error)
          }
-       
     }
 
     public async getAccountName({request, response}){

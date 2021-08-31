@@ -15,7 +15,6 @@ import * as Helper from "../common";
 
 import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
 
-
 export default class AdminsController {
   public async index({ auth, response }) {
     const user = await auth.user;
@@ -127,7 +126,7 @@ export default class AdminsController {
   }
 
   //create cards
-  public async card({request, response}){
+  public async card({ request, response }) {
     const data = schema.create({
       name: schema.string({}, [rules.required()]),
     });
@@ -138,18 +137,17 @@ export default class AdminsController {
           required: "This field is required",
         },
       });
-      const card = new Card()
-      card.name = payload.name,
-      card.save()
-      return response.send(card)
+      const card = new Card();
+      (card.name = payload.name), card.save();
+      return response.send(card);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.badRequest(error);
     }
   }
 
   //update cards
-  public async updateCard({request, response}){
+  public async updateCard({ request, response }) {
     const data = schema.create({
       name: schema.string({}, [rules.required()]),
       id: schema.number([rules.required()]),
@@ -161,18 +159,18 @@ export default class AdminsController {
           required: "This field is required",
         },
       });
-      const card = await Card.findByOrFail('id', payload.id)
-      card.name = payload.name
-      card.save()
-      return response.send(card)
+      const card = await Card.findByOrFail("id", payload.id);
+      card.name = payload.name;
+      card.save();
+      return response.send(card);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.badRequest(error);
     }
   }
 
-   //delete cards
-   public async deleteCard({request, response}){
+  //delete cards
+  public async deleteCard({ request, response }) {
     const data = schema.create({
       id: schema.number([rules.required()]),
     });
@@ -183,11 +181,11 @@ export default class AdminsController {
           required: "This field is required",
         },
       });
-      const card = await Card.findByOrFail('id', payload.id)
-     
-      return response.send(card)
+      const card = await Card.findByOrFail("id", payload.id);
+
+      return response.send(card);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.badRequest(error);
     }
   }
@@ -275,10 +273,28 @@ export default class AdminsController {
     }
   }
 
-  //change transaction status
-  public async updateCardStatus({ params, request, response }) {
+  //change card transaction status
+  public async updateCardStatus({ request, response }) {
     try {
-      const transaction = await CardTransaction.findByOrFail("id", params.id);
+      const transaction = await CardTransaction.findByOrFail(
+        "id",
+        request.input("id")
+      );
+      transaction.status = request.input("status");
+      transaction.save();
+      return response.send({ message: transaction });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  //change coin transaction status
+  public async updateCoinStatus({ request, response }) {
+    try {
+      const transaction = await CoinTransaction.findByOrFail(
+        "id",
+        request.input("id")
+      );
       transaction.status = request.input("status");
       transaction.save();
       return response.send({ message: transaction });
@@ -288,31 +304,20 @@ export default class AdminsController {
   }
 
   //confirm card transaction
-  public async confirmCardTransaction({ params, response }) {
+  public async confirmCardTransaction({ request, response }) {
     try {
-      const transaction = await CardTransaction.findByOrFail("id", params.id);
-      const status = await Status.find(transaction.status);
-      const wallet = await UserAmount.findBy("user_id", transaction.user_id);
-
-      if (status?.name !== "completed") {
-        return response.status(403).send({
-          message: "Kind update the status of this transaction to completed",
-        });
-      }
-
-      if (transaction?.completed === true) {
-        return response
-          .status(403)
-          .send({ message: "This transaction has been paid out" });
-      }
-      transaction.completed = true;
-      const pre = Number(wallet?.amount);
-      const value = Number(
-        transaction.$attributes.rate * transaction.$attributes.amount + pre
+      const transaction = await CardTransaction.findByOrFail(
+        "id",
+        request.input("id")
       );
-      await wallet?.merge({ amount: String(value) }).save();
-      transaction?.save();
-
+      const wallet = await UserAmount.findByOrFail(
+        "user_id",
+        request.input("user_id")
+      );
+      transaction.completed = true;
+      wallet.amount = `${transaction.total + Number(wallet.amount)}`;
+      wallet.save();
+      transaction.save();
       return response.send({ message: transaction });
     } catch (error) {
       console.log(error);
@@ -320,6 +325,27 @@ export default class AdminsController {
     }
   }
 
+  //confirm coin transaction
+  public async confirmCoinTransaction({ request, response }) {
+    try {
+      const transaction = await CoinTransaction.findByOrFail(
+        "id",
+        request.input("id")
+      );
+      const wallet = await UserAmount.findByOrFail(
+        "user_id",
+        request.input("user_id")
+      );
+      transaction.completed = true;
+      wallet.amount = `${transaction.total + Number(wallet.amount)}`;
+      wallet.save();
+      transaction.save();
+      return response.send({ message: transaction });
+    } catch (error) {
+      console.log(error);
+      return response.badRequest(error);
+    }
+  }
 
   //get all user Amount
   public async userWallet({ response }) {
@@ -367,13 +393,48 @@ export default class AdminsController {
 
   public async initiateWithdrawal({ request, response }) {
     try {
-      const { email, customer_id, amount, bank_code, account_number } = request;
-      const initializePayment = await Helper.paystack.initializeTransaction({
-        reference: "7PVGX8MEk85tgeEpVDtD",
-        amount: Number(amount) * 100, // 5,000 Naira (remember you have to pass amount in kobo)
-        email: email,
-        subaccount: customer_id,
+      const withdrawal = await UserWithdrawal.findByOrFail("id", request.input("id"))
+      await withdrawal?.load((loader) => {
+        loader
+          .load("account")
+          .load("status_name")
+          .load("user")
+          .load("userAmount");
       });
-    } catch (error) {}
+      // console.log(Helper.paystack)
+      const initializePayment = await Helper.paystack.transaction.initialize({
+        name: withdrawal.user.fullname,
+        account_number: withdrawal.account.account_number,
+        bank_code:  `0${withdrawal.account.bank_code}`,
+        amount: `${Number(withdrawal.amount) * 100}`,
+        email: withdrawal.user.email
+      });
+      // console.log(initializePayment)
+      withdrawal.receipt = initializePayment.data.reference
+      withdrawal.status = 2
+      withdrawal.save()
+      return response.send(withdrawal)
+    } catch (error) {
+      return response.badRequest("i didn't work")
+    }
+  }
+
+  public async verifyWithdrawal({request, response}){
+    console.log('processing')
+    const userWithdrawal = await UserWithdrawal.findByOrFail('id', request.input("id"))
+    await userWithdrawal?.load((loader) => {
+      loader
+        .load("account")
+        .load("status_name")
+        .load("user")
+        .load("userAmount");
+    });
+    const verify = Helper.paystack.transaction.verify({
+      reference:userWithdrawal.receipt
+    })
+    // if(verify.status == false){
+    //   return response.send("Something Went wrong")
+    // }
+   console.log(verify)
   }
 }

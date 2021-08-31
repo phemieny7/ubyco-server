@@ -1,6 +1,6 @@
 import Env from '@ioc:Adonis/Core/Env'
 // import AWS from  'aws-sdk'
-import PayStack from 'paystack-node'
+import PayStack from 'paystack-api'
 
 export const sendToken: any = (phone: string, message: string, ) => {
   const accountSid = Env.get('TWILIO_ACCOUNT_SID');

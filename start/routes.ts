@@ -63,28 +63,38 @@ Route.group(() => {
 
 Route.group(() => {
     Route.get('/', 'AdminController.index')
+    //get ALL USER
     Route.get('/user', 'AdminController.allUser')
+    //CALCULATE REVENUE
     Route.get('/revenue','AdminController.revenue')
+    //pending trade counter
     Route.get('/pending-trade', 'AdminController.pending')
+    //weekly card exchange calculation
     Route.get('/weekly-card-exchange', 'AdminController.weeklyCardExchange')
     Route.get('/user/:id', 'AdminController.user')
     Route.get('/card_brand', 'UserController.card')
     Route.get('/card_rate', 'AdminController.getCardRate')
     Route.get('/coin_rate', 'AdminController.getCoinRate')
     Route.put('/user_status', 'AdminController.userStatus')
-    Route.get('/card', 'AdminController.getCardsTransactions')
     Route.get('/all_card', 'AdminController.cardRate')
     Route.post('/create_card', 'AdminController.card')
     Route.put('/update_card', 'AdminController.updateCard')
     Route.delete('/delete_card', 'AdminController.deleteCard')
 
+    Route.get('/card', 'AdminController.getCardsTransactions')
     Route.get('/card/:id', 'AdminController.getCard')
-    Route.put('/card/:id', 'AdminController.updateCardStatus')
-    Route.put('/confirm-card/:id', 'AdminController.confirmCardTransaction')
+    Route.put('/card', 'AdminController.updateCardStatus')
+    Route.put('/confirm-card', 'AdminController.confirmCardTransaction')
+
     Route.get('/coin', 'AdminController.getCoinsTransactions')
     Route.get('/coin/:id', 'AdminController.getCoin')
-    Route.put('/coin/:id', 'AdminController.updateCoinStatus')
-    Route.put('/confirm-coin/:id', 'AdminController.confirmCoinTransaction')
+    Route.put('/coin', 'AdminController.updateCoinStatus')
+    Route.put('/confirm-coin', 'AdminController.confirmCoinTransaction')
+
     Route.get('/withdrawal', 'AdminController.allWithdrawal')
     Route.get('/withdrawal/:id', 'AdminController.userWithdrawal')
+
+    Route.put('/initiate-withdrawal', 'AdminController.initiateWithdrawal')
+    Route.put('/verify-withdrawal', 'AdminController.verifyWithdrawal')
+
 }).prefix('/admin').middleware(['auth', 'admin'])
