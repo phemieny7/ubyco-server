@@ -8,12 +8,12 @@ import Card from "App/Models/Card";
 
 import Coin from "App/Models/Coin";
 // import UserAccount from 'App/Models/UserAccount'
-import Status from "App/Models/Status";
+// import Status from "App/Models/Status";
 import UserWithdrawal from "App/Models/UserWithdrawal";
 import Database from "@ioc:Adonis/Lucid/Database";
 import * as Helper from "../common";
 
-import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
+import { schema, rules} from "@ioc:Adonis/Core/Validator";
 
 export default class AdminsController {
   public async index({ auth, response }) {
@@ -432,9 +432,8 @@ export default class AdminsController {
     const verify = Helper.paystack.transaction.verify({
       reference:userWithdrawal.receipt
     })
-    // if(verify.status == false){
-    //   return response.send("Something Went wrong")
-    // }
-   console.log(verify)
+    if(verify.status == false){
+      return response.send("Something Went wrong")
+    }
   }
 }
