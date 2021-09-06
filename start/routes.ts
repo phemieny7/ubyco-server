@@ -30,7 +30,8 @@ Route.put('forget', 'AuthController.forget')
 Route.get('/', 'AuthController.index').middleware('auth')
 Route.get('/list-banks', 'UserController.listBanks')
 Route.get('/get-picture/:folder/:filename', 'UserController.getPicture')
-
+Route.post('/subscribe', 'UserController.newSubscriber')
+Route.delete('/subscribe', 'UserController.deleteSubscriber')
 
 // user route
 Route.group(() => {
@@ -96,5 +97,15 @@ Route.group(() => {
 
     Route.put('/initiate-withdrawal', 'AdminController.initiateWithdrawal')
     Route.put('/verify-withdrawal', 'AdminController.verifyWithdrawal')
+
+    //newsletter
+    Route.post('/create-newsletter', 'AdminController.createNewsLetter')
+    Route.get('/get-newsletter', 'AdminController.getNewsLetter')
+
+    Route.get('/subscriber', 'AdminController.getSubscribers')
+    Route.post('/send-news-letter', 'AdminController.sendNewsLette')
+    Route.post('/create-newsletter-template', 'AdminController.createNewsLeterTemplate')
+    Route.delete('/delete-newsletter-template', 'AdminController.deleteNewsLeterTemplate')
+    Route.put('/update-newsletter-template', 'AdminController.updateNewsLeterTemplate')
 
 }).prefix('/admin').middleware(['auth', 'admin'])

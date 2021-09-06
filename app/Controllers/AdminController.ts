@@ -5,6 +5,7 @@ import CoinTransaction from "App/Models/CoinTransaction";
 import UserAmount from "App/Models/UserAmount";
 import CardType from "App/Models/CardType";
 import Card from "App/Models/Card";
+import NewLetterTemplate from "App/Models/NewLetterTemplate";
 
 import Coin from "App/Models/Coin";
 // import UserAccount from 'App/Models/UserAccount'
@@ -13,7 +14,8 @@ import UserWithdrawal from "App/Models/UserWithdrawal";
 import Database from "@ioc:Adonis/Lucid/Database";
 import * as Helper from "../common";
 
-import { schema, rules} from "@ioc:Adonis/Core/Validator";
+import { schema, rules } from "@ioc:Adonis/Core/Validator";
+import Subscriber from "App/Models/Subscriber";
 
 export default class AdminsController {
   public async index({ auth, response }) {
@@ -393,7 +395,10 @@ export default class AdminsController {
 
   public async initiateWithdrawal({ request, response }) {
     try {
-      const withdrawal = await UserWithdrawal.findByOrFail("id", request.input("id"))
+      const withdrawal = await UserWithdrawal.findByOrFail(
+        "id",
+        request.input("id")
+      );
       await withdrawal?.load((loader) => {
         loader
           .load("account")
@@ -405,23 +410,26 @@ export default class AdminsController {
       const initializePayment = await Helper.paystack.transaction.initialize({
         name: withdrawal.user.fullname,
         account_number: withdrawal.account.account_number,
-        bank_code:  `0${withdrawal.account.bank_code}`,
+        bank_code: `0${withdrawal.account.bank_code}`,
         amount: `${Number(withdrawal.amount) * 100}`,
-        email: withdrawal.user.email
+        email: withdrawal.user.email,
       });
       // console.log(initializePayment)
-      withdrawal.receipt = initializePayment.data.reference
-      withdrawal.status = 2
-      withdrawal.save()
-      return response.send(withdrawal)
+      withdrawal.receipt = initializePayment.data.reference;
+      withdrawal.status = 2;
+      withdrawal.save();
+      return response.send(withdrawal);
     } catch (error) {
-      return response.badRequest("i didn't work")
+      return response.badRequest("i didn't work");
     }
   }
 
-  public async verifyWithdrawal({request, response}){
-    console.log('processing')
-    const userWithdrawal = await UserWithdrawal.findByOrFail('id', request.input("id"))
+  public async verifyWithdrawal({ request, response }) {
+    console.log("processing");
+    const userWithdrawal = await UserWithdrawal.findByOrFail(
+      "id",
+      request.input("id")
+    );
     await userWithdrawal?.load((loader) => {
       loader
         .load("account")
@@ -430,10 +438,76 @@ export default class AdminsController {
         .load("userAmount");
     });
     const verify = Helper.paystack.transaction.verify({
-      reference:userWithdrawal.receipt
-    })
-    if(verify.status == false){
-      return response.send("Something Went wrong")
+      reference: userWithdrawal.receipt,
+    });
+    if (verify.status == false) {
+      return response.send("Something Went wrong");
     }
   }
+
+  //subscriber
+  public async getSubsriber({ response }) {
+    const subscriber = await Subscriber.all();
+    return response.send({ message: subscriber });
+  }
+
+  public async createNewsLetterTemplate({ request, response }) {
+    const data = schema.create({
+      title: schema.string({}, [rules.required()]),
+      body: schema.string({}, [rules.required()]),
+    });
+
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "The {{ field }} is required",
+        },
+      });
+
+      const newsletter = new NewLetterTemplate();
+      newsletter.title = payload.title;
+      newsletter.body = payload.body;
+      newsletter.save();
+      return response.send({ message: newsletter });
+    } catch (error) {
+      return response.badRequest("You can't create now");
+    }
+  }
+
+  public async editNewsLetterTemplate({ request, response, params }) {
+    const data = schema.create({
+      title: schema.string({}, [rules.required()]),
+      body: schema.string({}, [rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "The {{ field }} is required",
+        },
+      });
+
+      const newsletter = await NewLetterTemplate.findByOrFail('id', params.id);
+      newsletter.title = payload.title;
+      newsletter.body = payload.body;
+      await newsletter.save();
+      return response.send({ message: newsletter });
+    } catch (error) {
+      return response.badRequest("You can't create now");
+    }
+  }
+
+  public async deleteNewsLetterTemplate({ response, params }) {
+    try {
+      const newsletter = await NewLetterTemplate.findByOrFail('id', params.id);
+      await newsletter.delete();
+      await newsletter.save();
+      return response.send({ message: newsletter });
+    } catch (error) {
+      return response.badRequest("You can't create now");
+    }
+  }
+
+  public async 
 }
