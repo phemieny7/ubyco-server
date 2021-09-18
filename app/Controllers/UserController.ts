@@ -18,7 +18,15 @@ export default class UsersController {
   public async getProfile({ response, auth }) {
     try {
       const user = await auth.user;
-      await user?.load("userAmount");
+      await user?.load((loader) => {
+        loader
+          .load("userAmount")
+          .load("userAmount")
+          .load("userAccounts")
+          .load("coinTransaction")
+          .load("cardTransaction")
+          .load("userWithdrawal");
+      });
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest({ error });
@@ -123,10 +131,10 @@ export default class UsersController {
 
   public async listBanks({ response }) {
     try {
-      const bank = await Helper.paystack.listBanks({
+      const bank = await Helper.paystack.misc.list_banks({
         country: "nigeria",
       });
-      return response.send({ message: bank.body.data });
+      return response.send({ message: bank.data });
     } catch (error) {
       console.log(error);
       return response.badRequest({ error });

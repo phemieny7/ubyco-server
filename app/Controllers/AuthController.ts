@@ -82,8 +82,10 @@ export default class AuthController {
           email: user.email,
           phone: user.phone,
         });
+
+        // console.log(createCustomer)
         //add customer_code to user details for future communication
-        user.customer_id = createCustomer.body.data.customer_code;
+        user.customer_id = createCustomer.data.customer_code;
         //create user wallet
         await user.related("userAmount").create({
           amount: "0",

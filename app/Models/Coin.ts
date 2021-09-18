@@ -11,6 +11,9 @@ export default class Coin extends BaseModel {
   @column()
   public rate: string
 
+  @column()
+  public wallet: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

@@ -184,8 +184,80 @@ export default class AdminsController {
         },
       });
       const card = await Card.findByOrFail("id", payload.id);
+      card.delete()
+      return response.send('Data Deleted');
+    } catch (error) {
+      console.log(error);
+      return response.badRequest(error);
+    }
+  }
 
-      return response.send(card);
+   //create coin
+   public async coin({ request, response }) {
+    const data = schema.create({
+      name: schema.string({}, [rules.required()]),
+      wallet: schema.string({}, [rules.required()]),
+      rate: schema.string({}, [rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const coin = new Coin();
+      coin.wallet = payload.wallet,
+      coin.name = payload.name,
+      coin.rate = payload.rate 
+      coin.save();
+      return response.send(coin);
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  //update coins
+  public async updateCoin({ request, response }) {
+    const data = schema.create({
+      id: schema.number([rules.required()]),
+      name: schema.string({}, [rules.required()]),
+      wallet: schema.string({}, [rules.required()]),
+      rate: schema.string({}, [rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const coin = await Coin.findByOrFail("id", payload.id);
+      coin.name = payload.wallet,
+      coin.rate = payload.name,
+      coin.wallet = payload.rate,
+      await coin.save();
+      return response.send(coin);
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  //delete cards
+  public async deleteCoin({ request, response }) {
+    const data = schema.create({
+      id: schema.number([rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const coin = await Coin.findByOrFail("id", payload.id);
+      coin.delete()
+      return response.send('Deleted');
     } catch (error) {
       console.log(error);
       return response.badRequest(error);
@@ -509,5 +581,4 @@ export default class AdminsController {
     }
   }
 
-  public async 
 }
