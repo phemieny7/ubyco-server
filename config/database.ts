@@ -4,11 +4,11 @@
  * Feel free to let us know via PR, if you find something broken in this config
  * file.
  */
-import Url from 'url-parse'
-import Env from '@ioc:Adonis/Core/Env'
-import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
+import Url from "url-parse";
+import Env from "@ioc:Adonis/Core/Env";
+import { DatabaseConfig } from "@ioc:Adonis/Lucid/Database";
 
-const DATABASE_URL = new Url(Env.get('DATABASE_URL'))
+const DATABASE_URL = new Url(Env.get("DATABASE_URL"));
 const databaseConfig: DatabaseConfig = {
   /*
   |--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ const databaseConfig: DatabaseConfig = {
   | file.
   |
   */
-  connection: Env.get('DB_CONNECTION'),
+  connection: Env.get("DB_CONNECTION"),
 
   connections: {
     /*
@@ -35,16 +35,16 @@ const databaseConfig: DatabaseConfig = {
     |
     */
     pg: {
-      client: 'pg',
+      client: "pg",
       connection: {
-        host: DATABASE_URL.host as string,
-        port: Number(''),
-        user:  DATABASE_URL.user as string,
-        password:  DATABASE_URL.password as string,
-        database:  DATABASE_URL.pathname.substr(1) as string,
-        ssl:{
-          rejectUnauthorized:false
-        }
+        host: Env.get("PG_HOST", DATABASE_URL.host),
+        port: Env.get("PG_PORT", DATABASE_URL.port),
+        user: Env.get("PG_USER", DATABASE_URL.username),
+        password: Env.get("PG_PASSWORD", DATABASE_URL.password),
+        database: Env.get("PG_DATABASE", DATABASE_URL.pathname.substr(1)),
+        ssl: {
+          rejectUnauthorized: false,
+        },
       },
       migrations: {
         naturalSort: false,
@@ -52,8 +52,7 @@ const databaseConfig: DatabaseConfig = {
       healthCheck: false,
       debug: false,
     },
+  },
+};
 
-  }
-}
-
-export default databaseConfig
+export default databaseConfig;
