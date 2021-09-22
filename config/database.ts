@@ -4,10 +4,11 @@
  * Feel free to let us know via PR, if you find something broken in this config
  * file.
  */
-
+import Url from 'url-parse'
 import Env from '@ioc:Adonis/Core/Env'
 import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
 
+const DATABASE_URL = new Url(Env.get('DATABASE_URL'))
 const databaseConfig: DatabaseConfig = {
   /*
   |--------------------------------------------------------------------------
@@ -36,11 +37,14 @@ const databaseConfig: DatabaseConfig = {
     pg: {
       client: 'pg',
       connection: {
-        host: Env.get('PG_HOST'),
-        port: Env.get('PG_PORT'),
-        user: Env.get('PG_USER'),
-        password: 'Power007$$',
-        database: Env.get('PG_DB_NAME'),
+        host: DATABASE_URL.host as string,
+        port: Number(''),
+        user:  DATABASE_URL.user as string,
+        password:  DATABASE_URL.password as string,
+        database:  DATABASE_URL.pathname.substr(1) as string,
+        ssl:{
+          rejectUnauthorized:false
+        }
       },
       migrations: {
         naturalSort: false,
@@ -48,6 +52,7 @@ const databaseConfig: DatabaseConfig = {
       healthCheck: false,
       debug: false,
     },
+
   }
 }
 
