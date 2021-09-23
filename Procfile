@@ -1,1 +1,1 @@
-web: ENV_SILENT=true node ./build/server.js
+worker: ENV_SILENT=true node ./build/server.js
