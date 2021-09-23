@@ -28,4 +28,5 @@ export default Env.rules({
 	PAYSTACK_TOKEN: Env.schema.string(),
 	TWILIO_ACCOUNT_SID: Env.schema.string(),
 	TWILIO_AUTH_TOKEN: Env.schema.string(),
+	PHONE_NUMBER: Env.schema.string(),
 })

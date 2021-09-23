@@ -5,12 +5,13 @@ import PayStack from 'paystack-api'
 export const sendToken: any = (phone: string, message: string, ) => {
   const accountSid = Env.get('TWILIO_ACCOUNT_SID');
   const authToken = Env.get('TWILIO_AUTH_TOKEN');
+  const num = Env.get('PHONE_NUMBER');
   const client = require('twilio')(accountSid, authToken);
   
   client.messages
     .create({
        body: message,
-       from: '+18573203152',
+       from: num,
        to: phone
      })
     .then(message => console.log(message.sid));
