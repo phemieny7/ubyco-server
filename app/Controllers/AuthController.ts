@@ -139,6 +139,7 @@ export default class AuthController {
         });
       return response.status(200).send({ message: token , user });
     } catch (error) {
+      console.log(error)
       return response.badRequest(error);
     }
   }
