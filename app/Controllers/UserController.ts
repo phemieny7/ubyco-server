@@ -1,7 +1,7 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 // import User from 'App/Models/User'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
-import { cuid } from "@ioc:Adonis/Core/Helpers";
+import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 import Application from "@ioc:Adonis/Core/Application";
 import * as Helper from "../common";
 import Card from "App/Models/Card";
@@ -28,7 +28,7 @@ export default class UsersController {
           .load("userWithdrawal");
       });
       return response.send({ message: user });
-    } catch (error) {
+    } catch(error) {
       return response.badRequest({ error });
     }
   }
@@ -38,13 +38,6 @@ export default class UsersController {
       fullname: schema.string({}, [rules.required()]),
       phone: schema.string({ trim: true }, [rules.required()]),
       email: schema.string({ escape: true }, [rules.required(), rules.email()]),
-      //    username: schema.string({ trim: true }, [
-      //     rules.required(),
-      //     ]),
-      //     picture: schema.file({
-      //         size: '2mb',
-      //         extnames: ['jpg'],
-      //       }),
     });
 
     try {
@@ -57,22 +50,21 @@ export default class UsersController {
           email: "Invalid email input",
         },
       });
-      const fileName = `${cuid()}.${payload.picture.extname}`;
-      //Upload to tmp folder
-      await payload.picture.move(Application.tmpPath("uploads/profiles"), {
-        name: fileName,
-      });
-
       const user = await auth.user;
-      (user.phone = payload.phone),
-        (user.email = payload.email),
-        (user.fullname = payload.fullname),
-        (user.picture = fileName);
-
+      const file = request.file('picture')
+      //Upload to tmp folder
+      if (file) {
+        await cloudinary.upload(file, file.clientName)
+        user.picture = file.clientName
+      }
+      user.phone = payload.phone;
+      user.email = payload.email;
+      user.fullname = payload.fullname;
+       
       let name = payload.fullname.split(" ");
       //update paystack user detail to match on app
-      await Helper.paystack.updateCustomer({
-        customer_id: user.customer_id,
+      await Helper.paystack.customer.update ({
+        id: user.customer_id,
         first_name: name[0],
         last_name: name[1],
         email: payload.email,
@@ -82,6 +74,7 @@ export default class UsersController {
       user.save();
       return response.send({ message: user });
     } catch (error) {
+      console.log(error)
       return response.badRequest({ error });
     }
   }
@@ -119,7 +112,7 @@ export default class UsersController {
           required: "The {{ field }} is required",
         },
       });
-      const name = await Helper.paystack.resolveAccountNumber({
+      const name = await Helper.paystack.verification.resolveAccount({
         account_number: payload.account_number,
         bank_code: payload.bank_code,
       });

@@ -4,6 +4,7 @@ import Application from "@ioc:Adonis/Core/Application";
 import { cuid } from "@ioc:Adonis/Core/Helpers";
 import CoinTransaction from "App/Models/CoinTransaction";
 import Coin from "App/Models/Coin";
+import CloudinaryService from "../common/cloudinaryService";
 
 export default class BitcoinsController {
   public async intiateTrade({ request, response, auth }) {
@@ -19,33 +20,22 @@ export default class BitcoinsController {
         required: "The {{ field }} is required",
       },
     });
-
     try {
       const user = await auth.user;
       const coin: any = await Coin.findBy("id", payload.coin_id);
       const rate = await coin.rate;
 
-      const receipts = request.files("receipt", {
+      const receipt = request.file("receipt", {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
-
-      for (let receipt of receipts) {
-        await receipt.move(Application.tmpPath("uploads/coins"), {
-          name: `${cuid()}.${receipt.extname}`,
-        });
-      }
-
-      let name: any = [];
-      for (let i = 0; i < receipts.length; i++) {
-        name.push(receipts[i].fileName);
-      }
-
+      const cloudinaryResponse = await CloudinaryService.v2.uploader.upload(receipt.tmpPath, {folder: 'coin'});
+      
       const transaction = await user.related("coinTransaction").create({
         coin_id: payload.coin_id,
         comments: payload.comment,
         amount: payload.amount,
-        receipt: name,
+        receipt: cloudinaryResponse.secure_url,
         rate,
         total: Number(payload.amount * rate),
       });

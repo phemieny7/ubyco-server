@@ -24,7 +24,8 @@
     "./providers/AppProvider",
     "@adonisjs/core",
     "@adonisjs/auth",
-    "@adonisjs/lucid"
+    "@adonisjs/lucid",
+    "adonisjs-cloudinary"
   ],
   "aceProviders": [
     "@adonisjs/repl"
