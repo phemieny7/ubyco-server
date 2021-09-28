@@ -1,10 +1,8 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
-import Application from "@ioc:Adonis/Core/Application";
-import { cuid } from "@ioc:Adonis/Core/Helpers";
 import CoinTransaction from "App/Models/CoinTransaction";
 import Coin from "App/Models/Coin";
-import CloudinaryService from "../common/cloudinaryService";
+import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 
 export default class BitcoinsController {
   public async intiateTrade({ request, response, auth }) {
@@ -29,20 +27,19 @@ export default class BitcoinsController {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
-      const cloudinaryResponse = await CloudinaryService.v2.uploader.upload(receipt.tmpPath, {folder: 'coin'});
+      await cloudinary.upload(receipt, receipt.clientName)
       
       const transaction = await user.related("coinTransaction").create({
         coin_id: payload.coin_id,
         comments: payload.comment,
         amount: payload.amount,
-        receipt: cloudinaryResponse.secure_url,
+        receipt: receipt.clientName,
         rate,
         total: Number(payload.amount * rate),
       });
 
       return response.send({ message: transaction });
     } catch (error) {
-      console.log(error);
       return response.badRequest(error);
     }
   }
