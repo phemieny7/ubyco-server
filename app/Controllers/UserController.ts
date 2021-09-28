@@ -116,7 +116,7 @@ export default class UsersController {
         account_number: payload.account_number,
         bank_code: payload.bank_code,
       });
-      return response.send({ message: name.body.data.account_name });
+      return response.send({ message: name.data.account_name });
     } catch (error) {
       return response.badRequest({ message: error });
     }
