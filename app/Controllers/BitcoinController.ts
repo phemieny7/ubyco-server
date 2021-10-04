@@ -1,10 +1,10 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
-import Application from "@ioc:Adonis/Core/Application";
-import { cuid } from "@ioc:Adonis/Core/Helpers";
+// import Application from "@ioc:Adonis/Core/Application";
+// import { cuid } from "@ioc:Adonis/Core/Helpers";
 import CoinTransaction from "App/Models/CoinTransaction";
 import Coin from "App/Models/Coin";
-import CloudinaryService from "../common/cloudinaryService";
+// import CloudinaryService from "../common/cloudinaryService";
 
 export default class BitcoinsController {
   public async intiateTrade({ request, response, auth }) {

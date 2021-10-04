@@ -10,9 +10,7 @@ export default class UserSeeder extends BaseSeeder {
       role_id : 2,
       is_verified: true,
       fullname: 'ubyco super admin',
+      phone: '08012345678'
     });
-  }
-
-
   }
 }
