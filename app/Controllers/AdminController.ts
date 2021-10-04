@@ -37,7 +37,7 @@ export default class AdminsController {
   public async user({ response, params }) {
     try {
       const id = params.id;
-      const user = await User.find(id);
+      const user = await User.findByOrFail('role_id', 1);
       await user?.load((loader) => {
         loader
           .load("userAmount")
