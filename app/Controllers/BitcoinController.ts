@@ -27,13 +27,14 @@ export default class BitcoinsController {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
-      await cloudinary.upload(coinReceipt, coinReceipt.clientName)
+     const upload = await cloudinary.upload(coinReceipt, coinReceipt.clientName)
+     console.log(upload)
       
       const transaction = await user.related("coinTransaction").create({
         coin_id: payload.coin_id,
         comments: payload.comment,
         amount: payload.amount,
-        receipt: coinReceipt.clientName,
+        receipt: upload,
         rate,
         total: Number(payload.amount * rate),
       });

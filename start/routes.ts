@@ -29,7 +29,7 @@ Route.post('logout', 'AuthController.logout')
 Route.put('forget', 'AuthController.forget')
 Route.get('/', 'AuthController.index').middleware('auth')
 Route.get('/list-banks', 'UserController.listBanks')
-Route.get('/get-picture/:folder/:filename', 'UserController.getPicture')
+Route.get('/get-picture/:filename', 'UserController.getPicture')
 Route.post('/subscribe', 'UserController.newSubscriber')
 Route.delete('/subscribe', 'UserController.deleteSubscriber')
 
