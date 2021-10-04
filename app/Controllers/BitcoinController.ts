@@ -55,6 +55,7 @@ export default class BitcoinsController {
         .preload("status_name")
         .preload("user")
         .preload("coin");
+        
       return response.send({ message: trades });
     } catch (error) {
       return response.badRequest(error);
