@@ -29,13 +29,13 @@ export default class BitcoinsController {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
-      const cloudinaryResponse = await CloudinaryService.v2.uploader.upload(receipt.tmpPath, {folder: 'coin'});
+      // const cloudinaryResponse = await CloudinaryService.v2.uploader.upload(receipt.tmpPath, {folder: 'coin'});
       
       const transaction = await user.related("coinTransaction").create({
         coin_id: payload.coin_id,
         comments: payload.comment,
         amount: payload.amount,
-        receipt: cloudinaryResponse.secure_url,
+        receipt: 'cloudinaryResponse.secure_url',
         rate,
         total: Number(payload.amount * rate),
       });
