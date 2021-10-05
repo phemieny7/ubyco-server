@@ -1,8 +1,5 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
-// import Application from "@ioc:Adonis/Core/Application";
-// import { cuid } from "@ioc:Adonis/Core/Helpers";
-// import User from 'App/Models/User';
 import CardTransaction from "App/Models/CardTransaction";
 import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 
