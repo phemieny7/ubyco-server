@@ -81,9 +81,8 @@ export default class UsersController {
 
   public async getPicture({ params, response }) {
     try {
-      return response.attachment(
-        Application.tmpPath(`uploads/${params.folder}`, params.filename)
-      );
+      const data = await cloudinary.show(params.filename)
+      return response.send(data);
     } catch (error) {
       return response.badRequest({ error });
     }
