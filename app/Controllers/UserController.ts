@@ -2,7 +2,7 @@
 // import User from 'App/Models/User'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
 import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
-import Application from "@ioc:Adonis/Core/Application";
+// import Application from "@ioc:Adonis/Core/Application";
 import * as Helper from "../common";
 import Card from "App/Models/Card";
 import UserAmount from "App/Models/UserAmount";

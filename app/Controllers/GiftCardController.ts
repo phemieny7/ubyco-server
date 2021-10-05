@@ -1,7 +1,7 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
-import Application from "@ioc:Adonis/Core/Application";
-import { cuid } from "@ioc:Adonis/Core/Helpers";
+// import Application from "@ioc:Adonis/Core/Application";
+// import { cuid } from "@ioc:Adonis/Core/Helpers";
 // import User from 'App/Models/User';
 import CardTransaction from "App/Models/CardTransaction";
 import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
@@ -33,7 +33,7 @@ export default class GiftCardsController {
       });
 
       for (let card of cards) {
-        const upload = await cloudinary.upload(card, card.clientName)
+        await cloudinary.upload(card, card.clientName)
       }
 
       let name: any = [];

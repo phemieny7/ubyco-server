@@ -36,7 +36,7 @@ export default class AdminsController {
   //single User
   public async user({ response, params }) {
     try {
-      const id = params.id;
+      // const id = params.id;
       const user = await User.findByOrFail('role_id', 1);
       await user?.load((loader) => {
         loader
