@@ -26,7 +26,7 @@ export default class AdminsController {
   //all User
   public async allUser({ response }) {
     try {
-      const user = await User.query().preload("userAmount");
+      const user = await User.query().where('role_id', 1).preload("userAmount");
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
