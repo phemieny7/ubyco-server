@@ -26,7 +26,7 @@ export default class AdminsController {
   //all User
   public async allUser({ response }) {
     try {
-      const user = await User.query().where('role_id', 1).preload("userAmount");
+      const user = await User.query().where("role_id", 1).preload("userAmount");
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
@@ -35,16 +35,15 @@ export default class AdminsController {
 
   public async adminUser({ response }) {
     try {
-      const user = await User
-      .query() // 👈now have access to all query builder methods
-      .where('role_id', 2)
+      const user = await User.query() // 👈now have access to all query builder methods
+        .where("role_id", 2);
       return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
     }
   }
 
-  public async createAdmin({ response,request }) {
+  public async createAdmin({ response, request }) {
     const data = schema.create({
       fullname: schema.string({}, [rules.required()]),
       phone: schema.string({ trim: true }, [rules.required()]),
@@ -61,15 +60,16 @@ export default class AdminsController {
         },
       });
       const user = new User();
-      user.fullname = payload.fullname,
-      user.phone = payload.phone,
-      user.email = payload.email,
-      user.password = 'ubycoadmin123'
-      user.role_id = 2,
-      user.is_verified = true,
-      user.save();
+      (user.fullname = payload.fullname),
+        (user.phone = payload.phone),
+        (user.email = payload.email),
+        (user.password = "ubycoadmin123");
+      (user.role_id = 2), (user.is_verified = true), user.save();
       //send admin details
-      await Helper.sendToken(payload.phone, `your Ubyco admin detail is ${payload.email} and password is ubycoadmin123`)
+      await Helper.sendToken(
+        payload.phone,
+        `your Ubyco admin detail is ${payload.email} and password is ubycoadmin123`
+      );
 
       return response.send(user);
     } catch (error) {
@@ -77,7 +77,7 @@ export default class AdminsController {
     }
   }
 
-   public async updateAdmin({ response,request}) {
+  public async updateAdmin({ response, request }) {
     const data = schema.create({
       fullname: schema.string({}, [rules.required()]),
       phone: schema.string({ trim: true }, [rules.required()]),
@@ -93,30 +93,30 @@ export default class AdminsController {
           email: "Invalid email input",
         },
       });
-      const {id} = request.body()
+      const { id } = request.body();
 
       const user = await User.findOrFail(id);
-      user.fullname = payload.fullname,
-      user.phone = payload.phone,
-      user.email = payload.email,
-      user.banned = payload.status,
-      user?.save();
+      (user.fullname = payload.fullname),
+        (user.phone = payload.phone),
+        (user.email = payload.email),
+        (user.banned = payload.status),
+        user?.save();
       //send admin details
       // await Helper.sendToken(payload.phone, `your Ubyco admin detail is ${payload.email} and password is ubycoadmin123`)
 
       return response.send(user);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.badRequest(error);
     }
   }
 
-  public async deleteAdmin({request, response}){
-    try{
-    const {id} = request.body()
-    const user = await User.findByOrFail('id', id);
-    user.delete()
-    return response.send({ message: user });
+  public async deleteAdmin({ request, response }) {
+    try {
+      const { id } = request.body();
+      const user = await User.findByOrFail("id", id);
+      user.delete();
+      return response.send({ message: user });
     } catch (error) {
       return response.badRequest(error);
     }
@@ -125,7 +125,7 @@ export default class AdminsController {
   public async user({ response, params }) {
     try {
       const id = params.id;
-      const user = await User.findByOrFail('id', id);
+      const user = await User.findByOrFail("id", id);
       await user?.load((loader) => {
         loader
           .load("userAmount")
@@ -218,7 +218,7 @@ export default class AdminsController {
   public async createCardRate({ request, response }) {
     const data = schema.create({
       name: schema.string({}, [rules.required()]),
-      rate: schema.number([rules.required()])
+      rate: schema.number([rules.required()]),
     });
     try {
       const payload = await request.validate({
@@ -228,9 +228,9 @@ export default class AdminsController {
         },
       });
       const card = new CardType();
-      card.card_id = request.body().id
-      card.name = payload.name
-      card.rate = payload.rate
+      card.card_id = request.body().id;
+      card.name = payload.name;
+      card.rate = payload.rate;
       card.save();
       return response.send(card);
     } catch (error) {
@@ -239,26 +239,64 @@ export default class AdminsController {
     }
   }
 
-    //create cards
-    public async card({ request, response }) {
-      const data = schema.create({
-        name: schema.string({}, [rules.required()]),
+  //update card rate
+  public async updateCardRate({ request, response }) {
+    const data = schema.create({
+      name: schema.string({}, [rules.required()]),
+      rate: schema.number([rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
       });
-      try {
-        const payload = await request.validate({
-          schema: data,
-          messages: {
-            required: "This field is required",
-          },
-        });
-        const card = new Card();
-        (card.name = payload.name), card.save();
-        return response.send(card);
-      } catch (error) {
-        console.log(error);
-        return response.badRequest(error);
-      }
+      const { id, card_id } = request.body();
+      const card = await CardType.findByOrFail("id", id);
+      card.card_id = card_id;
+      card.name = payload.name;
+      card.rate = payload.rate;
+      card.save();
+      return response.send(card);
+    } catch (error) {
+      console.log(error);
+      return response.badRequest(error);
     }
+  }
+
+  //delete card rate
+  public async deleteCardRate({ request, response }) {
+    try {
+      const { id } = request.body();
+      const card = await CardType.findByOrFail("id", id);
+      card.delete();
+      return response.send("Worked");
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  //create cards
+  public async card({ request, response }) {
+    const data = schema.create({
+      name: schema.string({}, [rules.required()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "This field is required",
+        },
+      });
+      const card = new Card();
+      (card.name = payload.name), card.save();
+      return response.send(card);
+    } catch (error) {
+      console.log(error);
+      return response.badRequest(error);
+    }
+  }
 
   //update cards
   public async updateCard({ request, response }) {
@@ -296,16 +334,16 @@ export default class AdminsController {
         },
       });
       const card = await Card.findByOrFail("id", payload.id);
-      card.delete()
-      return response.send('Data Deleted');
+      card.delete();
+      return response.send("Data Deleted");
     } catch (error) {
       console.log(error);
       return response.badRequest(error);
     }
   }
 
-   //create coin
-   public async coin({ request, response }) {
+  //create coin
+  public async coin({ request, response }) {
     const data = schema.create({
       name: schema.string({}, [rules.required()]),
       wallet: schema.string({}, [rules.required()]),
@@ -319,9 +357,9 @@ export default class AdminsController {
         },
       });
       const coin = new Coin();
-      coin.wallet = payload.wallet,
-      coin.name = payload.name,
-      coin.rate = payload.rate 
+      (coin.wallet = payload.wallet),
+        (coin.name = payload.name),
+        (coin.rate = payload.rate);
       coin.save();
       return response.send(coin);
     } catch (error) {
@@ -345,10 +383,10 @@ export default class AdminsController {
         },
       });
       const coin = await Coin.findByOrFail("id", payload.id);
-      coin.name = payload.wallet,
-      coin.rate = payload.name,
-      coin.wallet = payload.rate,
-      await coin.save();
+      (coin.name = payload.wallet),
+        (coin.rate = payload.name),
+        (coin.wallet = payload.rate),
+        await coin.save();
       return response.send(coin);
     } catch (error) {
       return response.badRequest(error);
@@ -368,8 +406,8 @@ export default class AdminsController {
         },
       });
       const coin = await Coin.findByOrFail("id", payload.id);
-      coin.delete()
-      return response.send('Deleted');
+      coin.delete();
+      return response.send("Deleted");
     } catch (error) {
       console.log(error);
       return response.badRequest(error);
@@ -672,7 +710,7 @@ export default class AdminsController {
         },
       });
 
-      const newsletter = await NewLetterTemplate.findByOrFail('id', params.id);
+      const newsletter = await NewLetterTemplate.findByOrFail("id", params.id);
       newsletter.title = payload.title;
       newsletter.body = payload.body;
       await newsletter.save();
@@ -684,7 +722,7 @@ export default class AdminsController {
 
   public async deleteNewsLetterTemplate({ response, params }) {
     try {
-      const newsletter = await NewLetterTemplate.findByOrFail('id', params.id);
+      const newsletter = await NewLetterTemplate.findByOrFail("id", params.id);
       await newsletter.delete();
       await newsletter.save();
       return response.send({ message: newsletter });
@@ -692,5 +730,4 @@ export default class AdminsController {
       return response.badRequest("You can't create now");
     }
   }
-
 }
