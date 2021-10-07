@@ -209,16 +209,16 @@ export default class AdminsController {
         `select * from card_transactions`
       );
       return response.send({ message: weeklyCard });
-      console.log(weeklyCard);
     } catch (error) {
       console.log(error);
     }
   }
 
-  //create cards
-  public async card({ request, response }) {
+  //create card rate
+  public async createCardRate({ request, response }) {
     const data = schema.create({
       name: schema.string({}, [rules.required()]),
+      rate: schema.number([rules.required()])
     });
     try {
       const payload = await request.validate({
@@ -227,14 +227,38 @@ export default class AdminsController {
           required: "This field is required",
         },
       });
-      const card = new Card();
-      (card.name = payload.name), card.save();
+      const card = new CardType();
+      card.card_id = request.body().id
+      card.name = payload.name
+      card.rate = payload.rate
+      card.save();
       return response.send(card);
     } catch (error) {
       console.log(error);
       return response.badRequest(error);
     }
   }
+
+    //create cards
+    public async card({ request, response }) {
+      const data = schema.create({
+        name: schema.string({}, [rules.required()]),
+      });
+      try {
+        const payload = await request.validate({
+          schema: data,
+          messages: {
+            required: "This field is required",
+          },
+        });
+        const card = new Card();
+        (card.name = payload.name), card.save();
+        return response.send(card);
+      } catch (error) {
+        console.log(error);
+        return response.badRequest(error);
+      }
+    }
 
   //update cards
   public async updateCard({ request, response }) {
