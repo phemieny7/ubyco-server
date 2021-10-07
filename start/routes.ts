@@ -66,6 +66,14 @@ Route.group(() => {
     Route.get('/', 'AdminController.index')
     //get ALL USER
     Route.get('/user', 'AdminController.allUser')
+    //get admin users
+    Route.get('/adminuser', 'AdminController.adminUser')
+    //create admin
+    Route.post('/create-admin', 'AdminController.createAdmin')
+    //update admin
+    Route.put('/update-admin', 'AdminController.updateAdmin')
+    //delete admin
+    Route.post('/delete-admin', 'AdminController.deleteAdmin')
     //CALCULATE REVENUE
     Route.get('/revenue','AdminController.revenue')
     //pending trade counter

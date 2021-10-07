@@ -33,6 +33,94 @@ export default class AdminsController {
     }
   }
 
+  public async adminUser({ response }) {
+    try {
+      const user = await User
+      .query() // 👈now have access to all query builder methods
+      .where('role_id', 2)
+      return response.send({ message: user });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  public async createAdmin({ response,request }) {
+    const data = schema.create({
+      fullname: schema.string({}, [rules.required()]),
+      phone: schema.string({ trim: true }, [rules.required()]),
+      email: schema.string({ escape: true }, [rules.required(), rules.email()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "The {{ field }} is required",
+          "email.unique": "email already exist",
+          "phone.unique": "phone number already exist",
+          email: "Invalid email input",
+        },
+      });
+      const user = new User();
+      user.fullname = payload.fullname,
+      user.phone = payload.phone,
+      user.email = payload.email,
+      user.password = 'ubycoadmin123'
+      user.role_id = 2,
+      user.is_verified = true,
+      user.save();
+      //send admin details
+      await Helper.sendToken(payload.phone, `your Ubyco admin detail is ${payload.email} and password is ubycoadmin123`)
+
+      return response.send(user);
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+   public async updateAdmin({ response,request}) {
+    const data = schema.create({
+      fullname: schema.string({}, [rules.required()]),
+      phone: schema.string({ trim: true }, [rules.required()]),
+      email: schema.string({ escape: true }, [rules.required(), rules.email()]),
+    });
+    try {
+      const payload = await request.validate({
+        schema: data,
+        messages: {
+          required: "The {{ field }} is required",
+          "email.unique": "email already exist",
+          "phone.unique": "phone number already exist",
+          email: "Invalid email input",
+        },
+      });
+      const {id} = request.body()
+
+      const user = await User.findOrFail(id);
+      user.fullname = payload.fullname,
+      user.phone = payload.phone,
+      user.email = payload.email,
+      user.banned = payload.status,
+      user?.save();
+      //send admin details
+      // await Helper.sendToken(payload.phone, `your Ubyco admin detail is ${payload.email} and password is ubycoadmin123`)
+
+      return response.send(user);
+    } catch (error) {
+      console.log(error)
+      return response.badRequest(error);
+    }
+  }
+
+  public async deleteAdmin({request, response}){
+    try{
+    const {id} = request.body()
+    const user = await User.findByOrFail('id', id);
+    user.delete()
+    return response.send({ message: user });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
   //single User
   public async user({ response, params }) {
     try {
