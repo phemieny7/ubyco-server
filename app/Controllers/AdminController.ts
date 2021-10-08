@@ -393,7 +393,7 @@ export default class AdminsController {
     }
   }
 
-  //delete cards
+  //delete coins
   public async deleteCoin({ request, response }) {
     const data = schema.create({
       id: schema.number([rules.required()]),

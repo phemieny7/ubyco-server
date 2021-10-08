@@ -97,7 +97,7 @@ Route.group(() => {
     //coin Crud
     Route.post('/create_coin', 'AdminController.coin')
     Route.put('/update_coin', 'AdminController.updateCoin')
-    Route.delete('/delete_coin', 'AdminController.deleteCoin')
+    Route.post('/delete_coin', 'AdminController.deleteCoin')
 
     Route.get('/card', 'AdminController.getCardsTransactions')
     Route.get('/card/:id', 'AdminController.getCard')
