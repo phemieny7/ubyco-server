@@ -106,7 +106,6 @@ export default class AdminsController {
 
       return response.send(user);
     } catch (error) {
-      console.log(error);
       return response.badRequest(error);
     }
   }
@@ -446,7 +445,20 @@ export default class AdminsController {
   //get all card transactions
   public async getCardsTransactions({ response }) {
     try {
-      const transactions = await CardTransaction.query()
+      const transactions = await CardTransaction.query().where('completed', false)
+        .preload("status_name")
+        .preload("card")
+        .preload("user");
+      // console.log(transactions)
+      return response.send({ message: transactions });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  public async getCardTransactionsHistory({ response }) {
+    try {
+      const transactions = await CardTransaction.query().where('completed', true)
         .preload("status_name")
         .preload("card")
         .preload("user");
@@ -471,6 +483,19 @@ export default class AdminsController {
     }
   }
 
+   //get all coin transactions
+   public async getCoinsTransactionsHistory({ response }) {
+    try {
+      const transactions = await CoinTransaction.query().where('completed', true)
+        .preload("status_name")
+        .preload("coin")
+        .preload("user");
+      
+      return response.send({ message: transactions });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
   //get single coin transaction
   public async getCoin({ params, response }) {
     try {

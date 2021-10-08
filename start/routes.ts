@@ -101,10 +101,12 @@ Route.group(() => {
 
     Route.get('/card', 'AdminController.getCardsTransactions')
     Route.get('/card/:id', 'AdminController.getCard')
+    Route.get('/cardhistroy', 'AdminController.getCardTransactionsHistory')
     Route.put('/card', 'AdminController.updateCardStatus')
     Route.put('/confirm-card', 'AdminController.confirmCardTransaction')
 
     Route.get('/coin', 'AdminController.getCoinsTransactions')
+    Route.get('/coinhistroy', 'AdminController.getCoinsTransactionsHistory')
     Route.get('/coin/:id', 'AdminController.getCoin')
     Route.put('/coin', 'AdminController.updateCoinStatus')
     Route.put('/confirm-coin', 'AdminController.confirmCoinTransaction')
