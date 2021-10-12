@@ -105,6 +105,10 @@ export default class AuthController {
     }
   }
 
+  // public async requestToken({auth, request, response}){
+
+  // }
+
   public async login({ request, response, auth }) {
     //Validate User input
     const data = schema.create({
@@ -166,13 +170,15 @@ export default class AuthController {
       });
       //generate token
       const verification_code = await Helper.randomGenerator(100000, 999999);
+
+      //token sent
+      await Helper.sendToken(payload.phone, `your Ubycohub reset token is ${verification_code}`)
+
       //find phone if exist and update
       const user = await User.findByOrFail("phone", payload.phone);
       user.verification_code = verification_code;
       user.is_verified = false;
       user.save();
-      //token sent
-      //await sendToken(user.phone, `Your reset token is ${verification_code}`)
       return response.send({ message: "We sent you a token" });
     } catch (error) {
       return response.badRequest(error.messages);

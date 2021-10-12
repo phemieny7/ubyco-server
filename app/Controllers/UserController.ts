@@ -238,7 +238,6 @@ export default class UsersController {
   public async withdraw({ auth, request, response }) {
     const data = schema.create({
       amount: schema.number([rules.required()]),
-
       bank: schema.string({}, [rules.required()]),
     });
 
@@ -261,9 +260,9 @@ export default class UsersController {
       }
       const withdraw = new UserWithdrawal();
       withdraw.user_id = user.id;
-      (withdraw.bank = payload.bank),
-        (withdraw.amount = payload.amount),
-        withdraw.save();
+      withdraw.account_id = payload.bank,
+      withdraw.amount = payload.amount,
+      withdraw.save();
       return response.send({ message: "withdraw successfull" });
     } catch (error) {
       return response.badRequest({ message: error });
