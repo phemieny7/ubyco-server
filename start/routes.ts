@@ -104,6 +104,7 @@ Route.group(() => {
     Route.get('/cardhistroy', 'AdminController.getCardTransactionsHistory')
     Route.put('/card', 'AdminController.updateCardStatus')
     Route.put('/confirm-card', 'AdminController.confirmCardTransaction')
+    Route.put('/change-card-rate', 'AdminController.changeCardRate')
 
     Route.get('/coin', 'AdminController.getCoinsTransactions')
     Route.get('/coinhistroy', 'AdminController.getCoinsTransactionsHistory')

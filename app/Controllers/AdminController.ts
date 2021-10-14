@@ -522,6 +522,20 @@ export default class AdminsController {
     }
   }
 
+  //change card transaction rate
+  public async changeCardRate({request, response}){
+    const {id, rate} = request.body()
+    try {
+      const transaction = await CardTransaction.findByOrFail('id', id)
+      transaction.rate = rate
+      transaction.total = Number(transaction.amount) * Number(rate)
+      transaction.save()
+      return response.send({message: transaction})
+    } catch (error) {
+      return response.badRequest(error)
+    }
+  }
+
   //change card transaction status
   public async updateCardStatus({ request, response }) {
     try {
