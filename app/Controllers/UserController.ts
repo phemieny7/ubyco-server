@@ -230,7 +230,7 @@ export default class UsersController {
       });
       return response.send({ message: "Account Successfully added" });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       response.badRequest(error);
     }
   }
@@ -249,6 +249,9 @@ export default class UsersController {
         },
       });
       const user = await auth.user;
+      await user?.load("userAccounts");
+      const found = user.userAccounts.find( ({ bank }) => bank === payload.bank );
+      
       const wallet = await UserAmount.findByOrFail("user_id", user.id);
       if (payload.amount > wallet.amount) {
         return response.badRequest({ message: `Insufficient Amount` });
@@ -258,14 +261,16 @@ export default class UsersController {
           message: `Kindly increase your witdrawal funds`,
         });
       }
+
       const withdraw = new UserWithdrawal();
       withdraw.user_id = user.id;
-      withdraw.account_id = payload.bank,
+      withdraw.account_id = found.id,
       withdraw.amount = payload.amount,
       withdraw.save();
       return response.send({ message: "withdraw successfull" });
     } catch (error) {
-      return response.badRequest({ message: error });
+      console.log(error)
+      return response.badRequest({ message: "something went wrong"});
     }
   }
 
