@@ -23,3 +23,4 @@ export const randomGenerator: any = (max : number, min: number) :number =>  {
 }
 
 export const paystack: any = new PayStack(Env.get('PAYSTACK_TOKEN'), Env.get('NODE_ENV'))
+

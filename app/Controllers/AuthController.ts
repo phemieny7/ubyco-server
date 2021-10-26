@@ -1,7 +1,9 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
+import Mail from '@ioc:Adonis/Addons/Mail'
 import * as Helper from "../common";
 import User from "../Models/User";
+import View from '@adonisjs/view'
 
 export default class AuthController {
   public async register({ request, response }) {
@@ -37,7 +39,18 @@ export default class AuthController {
         ],
       });
       // send token to phone number
-      await Helper.sendToken(payload.phone, `your Ubyco token is ${verification_code}`)
+      // await Helper.sendToken(payload.phone, `your Ubyco token is ${verification_code}`)
+      await Mail.send((message) => {
+        message
+          .from('noreply@ubycohub.ng')
+          .to(payload.email)
+          .subject('Verify Account')
+          .html(`
+            <p>welcome ${payload.fullname}</p>
+            <p>${verification_code}</p>
+          `)
+      })
+  
 
       //Create new user
       const user = new User();

@@ -272,6 +272,7 @@ export default class AdminsController {
       card.delete();
       return response.send("Worked");
     } catch (error) {
+      console.log(error)
       return response.badRequest(error);
     }
   }
