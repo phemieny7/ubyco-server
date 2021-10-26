@@ -3,7 +3,6 @@ import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
 import Mail from '@ioc:Adonis/Addons/Mail'
 import * as Helper from "../common";
 import User from "../Models/User";
-import View from '@adonisjs/view'
 
 export default class AuthController {
   public async register({ request, response }) {
