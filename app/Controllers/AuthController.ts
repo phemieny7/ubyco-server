@@ -85,7 +85,7 @@ export default class AuthController {
         `
       }
 
-      await Helper.transporter.sendMail(mailData, (error:any, info:any) => {
+      await Helper.transporter.sendMail(mailData, (error:any) => {
         if(error){
           console.log(error)
           return response.badRequest(error.messages);
@@ -285,7 +285,7 @@ export default class AuthController {
         `
       }
 
-      await Helper.transporter.sendMail(mailData, (error:any, info:any) => {
+      await Helper.transporter.sendMail(mailData, (error:any) => {
         if(error){
           console.log(error)
           return response.badRequest(error.messages);
