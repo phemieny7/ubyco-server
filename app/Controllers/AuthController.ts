@@ -1,6 +1,6 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules, validator } from "@ioc:Adonis/Core/Validator";
-import Mail from '@ioc:Adonis/Addons/Mail'
+// import Mail from '@ioc:Adonis/Addons/Mail'
 import * as Helper from "../common";
 import User from "../Models/User";
 
