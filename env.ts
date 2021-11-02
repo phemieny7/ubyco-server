@@ -18,6 +18,8 @@ export default Env.rules({
   CLOUDINARY_CLOUD_NAME: Env.schema.string(),
   CLOUDINARY_API_KEY: Env.schema.string(),
   CLOUDINARY_API_SECRET: Env.schema.string(),  
-  MAILGUN_API_KEY: Env.schema.string(),
-  MAILGUN_DOMAIN: Env.schema.string(),
+  SMTP_HOST: Env.schema.string(),
+  SMTP_PORT: Env.schema.number(),
+  SMTP_USERNAME: Env.schema.string(),
+  SMTP_PASSWORD: Env.schema.string(),
 });

@@ -39,16 +39,67 @@ export default class AuthController {
       });
       // send token to phone number
       // await Helper.sendToken(payload.phone, `your Ubyco token is ${verification_code}`)
-      await Mail.send((message) => {
-        message
-          .from('noreply@ubycohub.ng')
-          .to(payload.email)
-          .subject('Verify Account')
-          .html(`
-            <p>welcome ${payload.fullname}</p>
-            <p>${verification_code}</p>
-          `)
+      
+      const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${payload.email}`,
+        subject: `Verify Your Email`,
+        html:`
+        <head>
+        </head>
+        <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly;">
+        <center style="width: 100%; background-color: #f1f1f1;">
+    <div style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+      &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+    </div>
+    <div style="max-width: 600px; margin: 0 auto;" class="email-container">
+    	<!-- BEGIN BODY -->
+      <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
+      	<tr>
+          <td valign="top" class="bg_white" style="padding: 1em 2.5em;">
+          	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+          		<tr>
+          			<td class="logo" style="text-align: center;">
+			            <h1><a href="#">UBYCO HUB</a></h1>
+			          </td>
+          		</tr>
+          	</table>
+          </td>
+	      </tr><!-- end tr -->
+				<tr>
+          <td valign="middle" class="hero hero-2 bg_white" style="padding: 4em 0;">
+            <table>
+            	<tr>
+            		<td>
+            			<div class="text" style="padding: 0 3em; text-align: center;">
+            				<p>Welcome on board, your token is  ${verification_code}</p>
+            			</div>
+            		</td>
+            	</tr>
+            </table>
+          </td>
+	      </tr><!-- end tr  -->
+        <table>
+       </center
+        </body>
+        `
+      }
+
+      await Helper.transporter.sendMail(mailData, (error:any, info:any) => {
+        if(error){
+          console.log(error)
+          return response.badRequest(error.messages);
+        }
       })
+      // await Mail.send((message) => {
+      //   message
+      //     .from('noreply@ubycohub.ng')
+      //     .to(payload.email)
+      //     .subject('Verify Account')
+      //     .html(`
+            
+      //     `)
+      // })
   
 
       //Create new user
@@ -59,7 +110,6 @@ export default class AuthController {
         (user.password = payload.password),
         (user.verification_code = verification_code);
       await user.save();
-      console.log(user)
       return response.status(200);
     } catch (error) {
       console.log(error)
@@ -160,6 +210,7 @@ export default class AuthController {
     }
   }
 
+   //In the end of every experience..........
   public async logout({ auth }) {
     await auth.use("api").revoke();
     return {
@@ -170,7 +221,7 @@ export default class AuthController {
   public async forget({ request, response }) {
     //validate
     const data = schema.create({
-      phone: schema.string({}, [rules.required()]),
+      email: schema.string({}, [rules.required()]),
     });
 
     try {
@@ -183,11 +234,64 @@ export default class AuthController {
       //generate token
       const verification_code = await Helper.randomGenerator(100000, 999999);
 
-      //token sent
-      await Helper.sendToken(payload.phone, `your Ubycohub reset token is ${verification_code}`)
+     
 
       //find phone if exist and update
-      const user = await User.findByOrFail("phone", payload.phone);
+      const user = await User.findByOrFail("email", payload.email);
+
+       //token sent
+       const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${payload.email}`,
+        subject: `Verify Your Email`,
+        html:`
+        <head>
+        </head>
+        <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly;">
+        <center style="width: 100%; background-color: #f1f1f1;">
+    <div style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+      &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+    </div>
+    <div style="max-width: 600px; margin: 0 auto;" class="email-container">
+    	<!-- BEGIN BODY -->
+      <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
+      	<tr>
+          <td valign="top" class="bg_white" style="padding: 1em 2.5em;">
+          	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+          		<tr>
+          			<td class="logo" style="text-align: center;">
+			            <h1><a href="#">UBYCO HUB</a></h1>
+			          </td>
+          		</tr>
+          	</table>
+          </td>
+	      </tr><!-- end tr -->
+				<tr>
+          <td valign="middle" class="hero hero-2 bg_white" style="padding: 4em 0;">
+            <table>
+            	<tr>
+            		<td>
+            			<div class="text" style="padding: 0 3em; text-align: center;">
+            				<p>Your request reset token is <strong>${verification_code}</strong></p>
+            			</div>
+            		</td>
+            	</tr>
+            </table>
+          </td>
+	      </tr><!-- end tr  -->
+        <table>
+        </center>
+        </body>
+        `
+      }
+
+      await Helper.transporter.sendMail(mailData, (error:any, info:any) => {
+        if(error){
+          console.log(error)
+          return response.badRequest(error.messages);
+        }
+      })
+
       user.verification_code = verification_code;
       user.is_verified = false;
       user.save();
