@@ -243,7 +243,7 @@ export default class AuthController {
        const mailData = {
         from: 'no-reply@ubycohubs.com',
         to: `${payload.email}`,
-        subject: `Verify Your Email`,
+        subject: `Reset Your Password`,
         html:`
         <head>
         </head>
