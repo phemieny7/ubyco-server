@@ -11,7 +11,7 @@ export default class GiftCardsController {
     const data = schema.create({
       card_type_id: schema.number([rules.required()]),
       amount: schema.string({}, [rules.required()]),
-      comment: schema.string({}, [rules.required()]),
+      // comment: schema.string({}, [rules.required()]),
       rate: schema.string({}, [rules.required()]),
     });
 
@@ -26,16 +26,16 @@ export default class GiftCardsController {
       const user = await auth.user;
       const cards = request.files("card",{
         size: "10mb",
-        extnames: ["jpg", "png"],
+        extnames: ["jpg", "png", "jpeg"],
       });
 
-      for (let card of cards) {
-        await cloudinary.upload(card, card.clientName)
-      }
+      // for (let card of cards) {
+      //   await cloudinary.upload(card, card.clientName)
+      // }
 
-      let name: any = [];
+      let name: any = {};
       for (let i = 0; i < cards.length; i++) {
-        name.push(cards[i].clientName);
+        name[i] = cards[i].clientName;
       }
       
       const transaction = new CardTransaction();
@@ -43,9 +43,8 @@ export default class GiftCardsController {
       transaction.card_type_id = payload.card_type_id,
       transaction.rate = payload.rate,
       transaction.amount = payload.amount,
-      transaction.comments = payload.comment,
+      transaction.comments = request.requestBody.comment,
       transaction.cards = name,
-      transaction.total = Number(payload.amount) * Number(payload.rate)
       transaction.save();
       return response.status(200);
     } catch (error) {

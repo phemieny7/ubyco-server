@@ -6,10 +6,11 @@ import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 
 export default class BitcoinsController {
   public async intiateTrade({ request, response, auth }) {
+    console.log(request)
     const data = schema.create({
       coin_id: schema.number([rules.required()]),
       amount: schema.string({}, [rules.required()]),
-      comment: schema.string({}, [rules.required()]),
+      // comment: schema.string({}, [rules.required()]),
     });
 
     const payload = await request.validate({
@@ -29,18 +30,19 @@ export default class BitcoinsController {
       });
      await cloudinary.upload(coinReceipt, coinReceipt.clientName)
      
+    //  console.log(request)
+     
       const transaction = await user.related("coinTransaction").create({
         coin_id: payload.coin_id,
-        comments: payload.comment,
+        comments: request.requestBody.comment,
         amount: payload.amount,
         receipt: coinReceipt.clientName,
         rate,
         total: Number(payload.amount * rate),
       });
-
       return response.send({ message: transaction });
     } catch (error) {
-      return response.badRequest(error);
+      console.log(error);
     }
   }
 

@@ -155,7 +155,8 @@ export default class AdminsController {
     }
   }
 
-  //calculate revenue of both cards and coin transaction
+  //calculate revenue of both cards and coin transaction where status
+  // is successful
   public async revenue({ response }) {
     try {
       const card = await Database.from("card_transactions")
