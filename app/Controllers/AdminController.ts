@@ -159,23 +159,10 @@ export default class AdminsController {
   // is successful
   public async revenue({ response }) {
     try {
-      const card = await Database.from("card_transactions")
-        .where("status", 4)
-        .sum("total");
-
-      const coin = await Database.from("coin_transactions")
-        .where("status", 4)
-        .sum("total");
-
-      const total_array = coin.concat(card);
-      const total = total_array.reduce(
-        (accum, item) => accum + Number(item.sum),
-        0
-      );
-
-      return response.send({ message: total });
+      const withdrawal = await UserWithdrawal.all()
+      return response.send({ message: withdrawal });
     } catch (error) {
-      return response.badRequest(error);
+      return response.send({message: 0});
     }
   }
 
