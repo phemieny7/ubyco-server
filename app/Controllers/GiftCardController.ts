@@ -29,9 +29,9 @@ export default class GiftCardsController {
         extnames: ["jpg", "png", "jpeg"],
       });
 
-      // for (let card of cards) {
-      //   await cloudinary.upload(card, card.clientName)
-      // }
+      for (let card of cards) {
+        await cloudinary.upload(card, card.clientName)
+      }
 
       let name: any = {};
       for (let i = 0; i < cards.length; i++) {
