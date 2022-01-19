@@ -235,10 +235,8 @@ export default class UsersController {
     }
   }
 
-  public async deleteAccount({ auth, request, response }) {
+  public async deleteAccount({ request, response }) {
     try {
-     
-      const user = await auth.user;
       const account = await UserAccount.findBy("id", request);
       await account?.delete();
       return response.send({ message: "Account Successfully deleted" });
