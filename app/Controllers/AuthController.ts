@@ -85,21 +85,8 @@ export default class AuthController {
         `
       }
 
-      await Helper.transporter.sendMail(mailData, (error:any) => {
-        if(error){
-          console.log(error)
-          return response.badRequest(error.messages);
-        }
-      })
-      // await Mail.send((message) => {
-      //   message
-      //     .from('noreply@ubycohub.ng')
-      //     .to(payload.email)
-      //     .subject('Verify Account')
-      //     .html(`
-            
-      //     `)
-      // })
+      
+  
   
 
       //Create new user
@@ -110,6 +97,13 @@ export default class AuthController {
         (user.password = payload.password),
         (user.verification_code = verification_code);
       await user.save();
+      await Helper.transporter.sendMail(mailData, (error:any) => {
+        if(error){
+          console.log(error)
+          return response.badRequest(error.messages);
+        }
+      })
+
       return response.status(200);
     } catch (error) {
       console.log(error)
@@ -159,7 +153,7 @@ export default class AuthController {
         // Generate Token
 
         const token: any = await auth.use("api").generate(user, {
-          expiresIn: "7days",
+          expiresIn: "2hours",
         });
         return response.status(200).send({ message: token, user });
     } catch (error) {
@@ -201,7 +195,7 @@ export default class AuthController {
       const token: any = await auth
         .use("api")
         .attempt(payload.email, payload.password, {
-          expiresIn: "7days",
+          expiresIn: "2hours",
         });
       return response.status(200).send({ message: token , user });
     } catch (error) {

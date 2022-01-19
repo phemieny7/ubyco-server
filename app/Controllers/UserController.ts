@@ -11,7 +11,7 @@ import Subscriber from "App/Models/Subscriber";
 
 import Coin from "App/Models/Coin";
 
-// import UserAccount from 'App/Models/UserAccount'
+import UserAccount from 'App/Models/UserAccount'
 // import { Response } from '@adonisjs/http-server/build/standalone';
 
 export default class UsersController {
@@ -232,6 +232,19 @@ export default class UsersController {
     } catch (error) {
       // console.log(error);
       response.badRequest(error);
+    }
+  }
+
+  public async deleteAccount({ auth, request, response }) {
+    try {
+      console.log(request.all())cd
+      const user = await auth.user;
+      const account = await UserAccount.findBy("id", request);
+      await account?.delete();
+      return response.send({ message: "Account Successfully deleted" });
+    } catch (error) {
+      // console.log(error);
+      return response.badRequest(error);
     }
   }
 

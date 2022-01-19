@@ -22,9 +22,6 @@ const databaseConfig: DatabaseConfig = {
         user: Env.get("PG_USER", DATABASE_URL.username),
         password: Env.get("PG_PASSWORD", DATABASE_URL.password),
         database: Env.get("PG_DB_NAME", DATABASE_URL.pathname.substr(1)),
-        ssl: {
-          rejectUnauthorized: false,
-        },
       },
       migrations: {
         naturalSort: false,
