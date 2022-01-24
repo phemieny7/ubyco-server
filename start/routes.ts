@@ -29,6 +29,7 @@ Route.group(() => {
     Route.post('/rate-calculator', 'UserController.rateCalculator')
     Route.post('/withdraw', 'UserController.withdraw')
     Route.get('/all_card', 'AdminController.cardRate')
+    Route.get('/card/:id', 'AdminController.getCard')
 }).prefix('/user').middleware('auth')
 //giftcard
 Route.group(() => {
