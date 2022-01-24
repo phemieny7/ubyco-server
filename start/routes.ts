@@ -23,12 +23,12 @@ Route.group(() => {
     Route.get('/get-account-name', 'UserController.getAccountName')
     Route.post('/add-account', 'UserController.addAccount')
     Route.post('/delete-account', 'UserController.deleteAccount')
-
     Route.get('/card', 'UserController.card')
     Route.get('/card-type', 'UserController.cardType')
     Route.get('/coin', 'UserController.coin')
     Route.post('/rate-calculator', 'UserController.rateCalculator')
     Route.post('/withdraw', 'UserController.withdraw')
+    Route.get('/all_card', 'AdminController.cardRate')
 }).prefix('/user').middleware('auth')
 //giftcard
 Route.group(() => {
