@@ -2,6 +2,8 @@
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
 import CardTransaction from "App/Models/CardTransaction";
 import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
+import * as Helper from "../common";
+
 
 
 // import User from 'App/Models/User'
@@ -46,6 +48,14 @@ export default class GiftCardsController {
       transaction.comments = request.requestBody.comment,
       transaction.cards = name,
       transaction.save();
+
+      const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${user.email}`,
+        subject: `Verify Your Email`,
+        html:`
+        `
+      }
       return response.status(200);
     } catch (error) {
       console.log(error);

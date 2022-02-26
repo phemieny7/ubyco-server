@@ -249,8 +249,8 @@ export default class UsersController {
 
   public async withdraw({ auth, request, response }) {
     const data = schema.create({
-      amount: schema.number([rules.required()]),
-      bank: schema.string({}, [rules.required()]),
+      amount: schema.string({},[rules.required()]),
+      bank: schema.number([rules.required()]),
     });
 
     try {
@@ -262,7 +262,8 @@ export default class UsersController {
       });
       const user = await auth.user;
       await user?.load("userAccounts");
-      const found = user.userAccounts.find( ({ bank }) => bank === payload.bank );
+      // const found = user.userAccounts.find( ({ bank }) => bank === payload.bank );
+      // console.log(found)
       
       const wallet = await UserAmount.findByOrFail("user_id", user.id);
       if (payload.amount > wallet.amount) {
@@ -276,13 +277,13 @@ export default class UsersController {
 
       const withdraw = new UserWithdrawal();
       withdraw.user_id = user.id;
-      withdraw.account_id = found.id,
+      withdraw.account_id = payload.bank,
       withdraw.amount = payload.amount,
+      // console.log(withdraw)
       withdraw.save();
       return response.send({ message: "withdraw successfull" });
     } catch (error) {
-      console.log(error)
-      return response.badRequest({ message: "something went wrong"});
+      return response.badRequest({ message: error.messages});
     }
   }
 
