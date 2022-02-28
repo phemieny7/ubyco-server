@@ -262,8 +262,8 @@ export default class UsersController {
       });
       const user = await auth.user;
       await user?.load("userAccounts");
-      // const found = user.userAccounts.find( ({ bank }) => bank === payload.bank );
-      // console.log(found)
+      const found = user.userAccounts.find( ({ bank }) => bank === payload.bank );
+      console.log(found)
       
       const wallet = await UserAmount.findByOrFail("user_id", user.id);
       if (payload.amount > wallet.amount) {

@@ -51,11 +51,17 @@ export default class GiftCardsController {
 
       const mailData = {
         from: 'no-reply@ubycohubs.com',
-        to: `${user.email}`,
-        subject: `Verify Your Email`,
-        html:`
+        to: `${user.email}, ubycohub@gmail.com`,
+        subject: `Trade initiated`,
+        html:` User ${user.email} just initiated a trade
         `
       }
+      await Helper.transporter.sendMail(mailData, (error: any) => {
+        if (error) {
+          console.log(error);
+          return response.badRequest(error.messages);
+        }
+      });
       return response.status(200);
     } catch (error) {
       console.log(error);
