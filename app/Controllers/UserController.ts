@@ -279,7 +279,6 @@ export default class UsersController {
       withdraw.user_id = user.id;
       withdraw.account_id = payload.bank,
       withdraw.amount = payload.amount,
-      // console.log(withdraw)
       withdraw.save();
       const mailData = {
         from: 'no-reply@ubycohubs.com',
@@ -294,6 +293,7 @@ export default class UsersController {
           return response.badRequest(error.messages);
         }
       });
+      
       return response.send({ message: "withdraw successfull" });
     } catch (error) {
       return response.badRequest({ message: error.messages});
