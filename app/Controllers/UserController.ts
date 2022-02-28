@@ -266,10 +266,10 @@ export default class UsersController {
       console.log(found)
       
       const wallet = await UserAmount.findByOrFail("user_id", user.id);
-      if (payload.amount > wallet.amount) {
+      if (Number(payload.amount) >Number(wallet.amount)) {
         return response.badRequest({ message: `Insufficient Amount` });
       }
-      if (payload.amount < 2000) {
+      if (Number(payload.amount < 2000)) {
         return response.badRequest({
           message: `Kindly increase your witdrawal funds`,
         });
@@ -281,6 +281,19 @@ export default class UsersController {
       withdraw.amount = payload.amount,
       // console.log(withdraw)
       withdraw.save();
+      const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${user.email}, ubycohub@gmail.com`,
+        subject: `Withdrawal initiated`,
+        html:` User ${user.email} just request a withdrawal of ${payload.amount}
+        `
+      }
+      await Helper.transporter.sendMail(mailData, (error: any) => {
+        if (error) {
+          console.log(error);
+          return response.badRequest(error.messages);
+        }
+      });
       return response.send({ message: "withdraw successfull" });
     } catch (error) {
       return response.badRequest({ message: error.messages});
