@@ -6,7 +6,7 @@ import UserAmount from "App/Models/UserAmount";
 import CardType from "App/Models/CardType";
 import Card from "App/Models/Card";
 import NewLetterTemplate from "App/Models/NewLetterTemplate";
-
+import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 import Coin from "App/Models/Coin";
 // import UserAccount from 'App/Models/UserAccount'
 // import Status from "App/Models/Status";
@@ -109,7 +109,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   public async deleteAdmin({ request, response }) {
     try {
       const { id } = request.body();
@@ -139,7 +138,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //change user status
   public async userStatus({ request, response }) {
     try {
@@ -154,7 +152,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //calculate revenue of both cards and coin transaction where status
   // is successful
   public async revenue({ response }) {
@@ -251,7 +248,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //delete card rate
   public async deleteCardRate({ request, response }) {
     try {
@@ -285,7 +281,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //update cards
   public async updateCard({ request, response }) {
     const data = schema.create({
@@ -308,7 +303,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //delete cards
   public async deleteCard({ request, response }) {
     const data = schema.create({
@@ -329,7 +323,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //create coin
   public async coin({ request, response }) {
     const data = schema.create({
@@ -354,7 +347,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //update coins
   public async updateCoin({ request, response }) {
     const data = schema.create({
@@ -380,7 +372,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //delete coins
   public async deleteCoin({ request, response }) {
     const data = schema.create({
@@ -401,7 +392,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   // fetch cards and children rate
   public async cardRate({ response }) {
     try {
@@ -457,7 +447,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //get all coin transactions
   public async getCoinsTransactions({ response }) {
     try {
@@ -471,8 +460,7 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
-   //get all coin transactions
+  //get all coin transactions
    public async getCoinsTransactionsHistory({ response }) {
     try {
       const transactions = await CoinTransaction.query().where('completed', true)
@@ -497,7 +485,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //get single card transaction
   public async getCard({ params, response }) {
     try {
@@ -510,7 +497,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //change card transaction rate
   public async changeCardRate({request, response}){
     const {id, rate} = request.body()
@@ -524,7 +510,6 @@ export default class AdminsController {
       return response.badRequest(error)
     }
   }
-
   //change card transaction status
   public async updateCardStatus({ request, response }) {
     try {
@@ -539,7 +524,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //change coin transaction status
   public async updateCoinStatus({ request, response }) {
     try {
@@ -554,7 +538,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //confirm card transaction
   public async confirmCardTransaction({ request, response }) {
     try {
@@ -576,7 +559,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //confirm coin transaction
   public async confirmCoinTransaction({ request, response }) {
     try {
@@ -598,7 +580,6 @@ export default class AdminsController {
       return response.badRequest(error);
     }
   }
-
   //get all user Amount
   public async userWallet({ response }) {
     try {
@@ -664,7 +645,6 @@ export default class AdminsController {
         amount: `${Number(withdrawal.amount) * 100}`,
         email: withdrawal.user.email,
       });
-      // console.log(initializePayment)
       withdrawal.receipt = initializePayment.data.reference;
       withdrawal.status = 2;
       withdrawal.save();
@@ -674,8 +654,48 @@ export default class AdminsController {
     }
   }
 
+  public async manualWithdrawal({request, response}){
+    try {
+      const withdrawReceipt = request.file("receipt", {
+        size: "10mb",
+        extnames: ["jpg", "png"],
+      });
+      await cloudinary.upload(withdrawReceipt, withdrawReceipt.clientName)
+      const withdrawal = await UserWithdrawal.findByOrFail(
+        "id",
+        request.input("id")
+      );
+      await withdrawal?.load((loader) => {
+        loader
+          .load("account")
+          .load("status_name")
+          .load("user")
+      })
+        
+      withdrawal.status = 4;
+      withdrawal.receipt = withdrawReceipt.clientName;
+      withdrawal.completed = true
+      withdrawal.save()
+      const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${withdrawal.user.email}, ubycohub@gmail.com`,
+        subject: `Withdrawal Completed`,
+        html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful
+        `
+      }
+      await Helper.transporter.sendMail(mailData, (error: any) => {
+        if (error) {
+          return response.badRequest(error.messages);
+        }
+      });
+      return response.status(200);
+    }
+    catch (error) {
+      response.badRequest('something went wrong')
+    }
+  }
+
   public async verifyWithdrawal({ request, response }) {
-    console.log("processing");
     const userWithdrawal = await UserWithdrawal.findByOrFail(
       "id",
       request.input("id")
