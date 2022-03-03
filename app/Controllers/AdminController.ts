@@ -159,7 +159,7 @@ export default class AdminsController {
   // is successful
   public async revenue({ response }) {
     try {
-      const withdrawal = await UserWithdrawal.all()
+      const withdrawal = await UserWithdrawal.findBy("completed", true)
       return response.send({ message: withdrawal });
     } catch (error) {
       return response.send({message: 0});
