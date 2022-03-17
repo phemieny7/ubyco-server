@@ -598,9 +598,11 @@ export default class AdminsController {
   public async allWithdrawal({ response }) {
     try {
       const allWithdrawals = await UserWithdrawal.query()
+        .where("status", "1" || "2")
         .preload("user")
         .preload("status_name")
         .preload("userAmount");
+        console.log(allWithdrawals)
       return response.send({ message: allWithdrawals });
     } catch (error) {
       return response.badRequest(error);
@@ -670,24 +672,26 @@ export default class AdminsController {
           .load("account")
           .load("status_name")
           .load("user")
+          .load("userAmount");
       })
         
       withdrawal.status = 4;
       withdrawal.receipt = withdrawReceipt.clientName;
       withdrawal.completed = true
+      withdrawal.userAmount.amount = `${Number(withdrawal.userAmount.amount) - Number(withdrawal.amount)}`
       withdrawal.save()
-      const mailData = {
-        from: 'no-reply@ubycohubs.com',
-        to: `${withdrawal.user.email}, ubycohub@gmail.com`,
-        subject: `Withdrawal Completed`,
-        html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful
-        `
-      }
-      await Helper.transporter.sendMail(mailData, (error: any) => {
-        if (error) {
-          return response.badRequest(error.messages);
-        }
-      });
+      // const mailData = {
+      //   from: 'no-reply@ubycohubs.com',
+      //   to: `${withdrawal.user.email}, ubycohub@gmail.com`,
+      //   subject: `Withdrawal Completed`,
+      //   html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful.`
+      // }
+      // await Helper.transporter.sendMail(mailData, (error: any) => {
+      //   if (error) {
+      
+      //     return response.badRequest(error.messages);
+      //   }
+      // });
       return response.status(200);
     }
     catch (error) {
@@ -707,12 +711,16 @@ export default class AdminsController {
         .load("user")
         .load("userAmount");
     });
-    const verify = Helper.paystack.transaction.verify({
-      reference: userWithdrawal.receipt,
-    });
-    if (verify.status == false) {
+    const userAmount = await UserAmount.findByOrFail('id', userWithdrawal.user_id)
+    console.log(userAmount)
+    // userWithdrawal.userAmount.amount = `${Number(userWithdrawal.userAmount.amount) - Number(userWithdrawal.amount)}`;
+    // userWithdrawal.save();
+    // const verify = Helper.paystack.transaction.verify({
+    //   reference: userWithdrawal.receipt,
+    // });
+    // if (verify.status == true) {
       return response.send("Something Went wrong");
-    }
+    // }
   }
 
   //subscriber
