@@ -609,6 +609,34 @@ export default class AdminsController {
     }
   }
 
+  public async allFailedWithdrawal({ response }) {
+    try {
+      const allWithdrawals = await UserWithdrawal.query()
+        .where("status", "3")
+        .preload("user")
+        .preload("status_name")
+        .preload("userAmount");
+        console.log(allWithdrawals)
+      return response.send({ message: allWithdrawals });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
+  public async allSuccessWithdrawal({ response }) {
+    try {
+      const allWithdrawals = await UserWithdrawal.query()
+        .where("status", "4")
+        .preload("user")
+        .preload("status_name")
+        .preload("userAmount");
+        console.log(allWithdrawals)
+      return response.send({ message: allWithdrawals });
+    } catch (error) {
+      return response.badRequest(error);
+    }
+  }
+
   public async userWithdrawal({ response, params }) {
     try {
       const withdrawal = await UserWithdrawal.findByOrFail("id", params.id);
