@@ -598,11 +598,12 @@ export default class AdminsController {
   public async allWithdrawal({ response }) {
     try {
       const allWithdrawals = await UserWithdrawal.query()
-        .where("status", "1" || "2")
+        .where("status", "1")
+        .orWhere("status", "2")
         .preload("user")
         .preload("status_name")
         .preload("userAmount");
-        console.log(allWithdrawals)
+        // console.log(allWithdrawals)
       return response.send({ message: allWithdrawals });
     } catch (error) {
       return response.badRequest(error);
@@ -751,6 +752,17 @@ export default class AdminsController {
     // }
   }
 
+  //update withdrawal status
+  public async changeWithdrawalStatus({ request, response }) {
+    const userWithdrawal = await UserWithdrawal.findByOrFail(
+      "id",
+      request.input("id")
+    );
+    userWithdrawal.status = request.input("status");
+    console.log(userWithdrawal)
+    userWithdrawal.save()
+    return response.send("Something Went wrong");
+  }
   //subscriber
   public async getSubsriber({ response }) {
     const subscriber = await Subscriber.all();

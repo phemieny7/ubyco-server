@@ -105,6 +105,8 @@ Route.group(() => {
     Route.put('/initiate-withdrawal', 'AdminController.initiateWithdrawal')
     Route.put('/verify-withdrawal', 'AdminController.verifyWithdrawal')
     Route.put('/manual-withdrawal', 'AdminController.manualWithdrawal')
+    Route.put('/changewithdrawalstatus', 'AdminController.changeWithdrawalStatus')
+
 
     //newsletter
     Route.post('/create-newsletter', 'AdminController.createNewsLetter')
