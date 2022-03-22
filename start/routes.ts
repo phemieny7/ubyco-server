@@ -97,6 +97,8 @@ Route.group(() => {
     Route.put('/coin', 'AdminController.updateCoinStatus')
     Route.put('/confirm-coin', 'AdminController.confirmCoinTransaction')
 
+    Route.post('/delete-amount', 'AdminController.deleteUserAmount')
+
     Route.get('/withdrawal', 'AdminController.allWithdrawal')
     Route.get('/failedwithdrawal', 'AdminController.allFailedWithdrawal')
     Route.get('/successwithdrawal', 'AdminController.allSuccessWithdrawal')

@@ -648,6 +648,7 @@ export default class AdminsController {
           .load("user")
           .load("userAmount");
       });
+      console.log(withdrawal);
       return response.send({ message: withdrawal });
     } catch (error) {
       console.log(error);
@@ -686,46 +687,58 @@ export default class AdminsController {
   }
 
   public async manualWithdrawal({request, response}){
+  //  const {amount, account_number, bank_code, reference} = request.all()
     try {
       const withdrawReceipt = request.file("receipt", {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
       await cloudinary.upload(withdrawReceipt, withdrawReceipt.clientName)
-      const withdrawal = await UserWithdrawal.findByOrFail(
-        "id",
-        request.input("id")
-      );
+      const withdrawal = await UserWithdrawal.findByOrFail("id", request.input('id'));
       await withdrawal?.load((loader) => {
         loader
           .load("account")
           .load("status_name")
           .load("user")
           .load("userAmount");
-      })
-        
+      });
+      // console.log(withdrawal.user)
+      const wallet = await UserAmount.findByOrFail(
+        "user_id",
+        withdrawal.user.id
+      );
       withdrawal.status = 4;
       withdrawal.receipt = withdrawReceipt.clientName;
       withdrawal.completed = true
-      withdrawal.userAmount.amount = `${Number(withdrawal.userAmount.amount) - Number(withdrawal.amount)}`
+      wallet.amount = `${Number(wallet.amount) - Number(withdrawal.amount)}`
+      // console.log(wallet)
       withdrawal.save()
-      // const mailData = {
-      //   from: 'no-reply@ubycohubs.com',
-      //   to: `${withdrawal.user.email}, ubycohub@gmail.com`,
-      //   subject: `Withdrawal Completed`,
-      //   html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful.`
-      // }
-      // await Helper.transporter.sendMail(mailData, (error: any) => {
-      //   if (error) {
+      wallet.save()
+      const mailData = {
+        from: 'no-reply@ubycohubs.com',
+        to: `${withdrawal.user.email}, ubycohub@gmail.com`,
+        subject: `Withdrawal Completed`,
+        html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful.`
+      }
+      await Helper.transporter.sendMail(mailData, (error: any) => {
+        if (error) {
       
-      //     return response.badRequest(error.messages);
-      //   }
-      // });
+          return response.badRequest(error.messages);
+        }
+      });
       return response.status(200);
     }
     catch (error) {
+      console.log(error)
       response.badRequest('something went wrong')
     }
+
+  }
+
+  public async deleteUserAmount({request, response}){
+    const amount = await UserAmount.findByOrFail('id', request.input('id'))
+    amount.delete()
+    return response.status(200)
   }
 
   public async verifyWithdrawal({ request, response }) {
@@ -741,14 +754,19 @@ export default class AdminsController {
         .load("userAmount");
     });
     const userAmount = await UserAmount.findByOrFail('id', userWithdrawal.user_id)
-    console.log(userAmount)
-    // userWithdrawal.userAmount.amount = `${Number(userWithdrawal.userAmount.amount) - Number(userWithdrawal.amount)}`;
-    // userWithdrawal.save();
-    // const verify = Helper.paystack.transaction.verify({
-    //   reference: userWithdrawal.receipt,
-    // });
+    // console.log(userAmount)
+    userAmount.amount = `${Number(userAmount.amount) - Number(userWithdrawal.amount)}`;
+    userWithdrawal.status = 4;
+    // userWithdrawal.receipt = withdrawReceipt.clientName;
+    userWithdrawal.completed = true
+    userWithdrawal.save();
+    userAmount.save();
+    const verify = Helper.paystack.transaction.verify({
+      reference: userWithdrawal.receipt,
+    });
+    verify.status === "success" ? response.status(200) : response.status(400);
     // if (verify.status == true) {
-      return response.send("Something Went wrong");
+    //   return response.send("Something Went wrong");
     // }
   }
 
