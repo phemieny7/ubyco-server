@@ -6,7 +6,7 @@ import UserAmount from "App/Models/UserAmount";
 import CardType from "App/Models/CardType";
 import Card from "App/Models/Card";
 import NewLetterTemplate from "App/Models/NewLetterTemplate";
-import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
+import cloudinary from "@ioc:Adonis/Addons/Cloudinary";
 import Coin from "App/Models/Coin";
 // import UserAccount from 'App/Models/UserAccount'
 // import Status from "App/Models/Status";
@@ -156,10 +156,10 @@ export default class AdminsController {
   // is successful
   public async revenue({ response }) {
     try {
-      const withdrawal = await UserWithdrawal.findBy("completed", true)
+      const withdrawal = await UserWithdrawal.findBy("completed", true);
       return response.send({ message: withdrawal });
     } catch (error) {
-      return response.send({message: 0});
+      return response.send({ message: 0 });
     }
   }
 
@@ -236,9 +236,9 @@ export default class AdminsController {
           required: "This field is required",
         },
       });
-      const { id, card_id } = request.body();
-      const card = await CardType.findByOrFail("id", id);
-      card.card_id = card_id;
+      const { card_id } = request.body();
+      const card = await CardType.findByOrFail("id", card_id);
+      // card.card_id = card_id;
       card.name = payload.name;
       card.rate = payload.rate;
       card.save();
@@ -256,7 +256,7 @@ export default class AdminsController {
       card.delete();
       return response.send("Worked");
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.badRequest(error);
     }
   }
@@ -424,7 +424,8 @@ export default class AdminsController {
   //get all card transactions
   public async getCardsTransactions({ response }) {
     try {
-      const transactions = await CardTransaction.query().where('completed', false)
+      const transactions = await CardTransaction.query()
+        .where("completed", false)
         .preload("status_name")
         .preload("card")
         .preload("user");
@@ -437,7 +438,8 @@ export default class AdminsController {
 
   public async getCardTransactionsHistory({ response }) {
     try {
-      const transactions = await CardTransaction.query().where('completed', true)
+      const transactions = await CardTransaction.query()
+        .where("completed", true)
         .preload("status_name")
         .preload("card")
         .preload("user");
@@ -461,13 +463,14 @@ export default class AdminsController {
     }
   }
   //get all coin transactions
-   public async getCoinsTransactionsHistory({ response }) {
+  public async getCoinsTransactionsHistory({ response }) {
     try {
-      const transactions = await CoinTransaction.query().where('completed', true)
+      const transactions = await CoinTransaction.query()
+        .where("completed", true)
         .preload("status_name")
         .preload("coin")
         .preload("user");
-      
+
       return response.send({ message: transactions });
     } catch (error) {
       return response.badRequest(error);
@@ -498,16 +501,16 @@ export default class AdminsController {
     }
   }
   //change card transaction rate
-  public async changeCardRate({request, response}){
-    const {id, rate} = request.body()
+  public async changeCardRate({ request, response }) {
+    const { id, rate } = request.body();
     try {
-      const transaction = await CardTransaction.findByOrFail('id', id)
-      transaction.rate = rate
-      transaction.total = Number(transaction.amount) * Number(rate)
-      transaction.save()
-      return response.send({message: transaction})
+      const transaction = await CardTransaction.findByOrFail("id", id);
+      transaction.rate = rate;
+      transaction.total = Number(transaction.amount) * Number(rate);
+      transaction.save();
+      return response.send({ message: transaction });
     } catch (error) {
-      return response.badRequest(error)
+      return response.badRequest(error);
     }
   }
   //change card transaction status
@@ -543,14 +546,14 @@ export default class AdminsController {
     try {
       const transaction = await CardTransaction.findByOrFail(
         "id",
-        request.input("id")
+        request.input("id") 
       );
       const wallet = await UserAmount.findByOrFail(
         "user_id",
         request.input("user_id")
       );
       transaction.completed = true;
-      wallet.amount = `${transaction.total + Number(wallet.amount)}`;
+      wallet.amount = `${Number(transaction.total) + Number(wallet.amount)}`;
       wallet.save();
       transaction.save();
       return response.send({ message: transaction });
@@ -571,7 +574,7 @@ export default class AdminsController {
         request.input("user_id")
       );
       transaction.completed = true;
-      wallet.amount = `${transaction.total + Number(wallet.amount)}`;
+      wallet.amount = `${Number(transaction.total) + Number(wallet.amount)}`;
       wallet.save();
       transaction.save();
       return response.send({ message: transaction });
@@ -603,7 +606,7 @@ export default class AdminsController {
         .preload("user")
         .preload("status_name")
         .preload("userAmount");
-        // console.log(allWithdrawals)
+      // console.log(allWithdrawals)
       return response.send({ message: allWithdrawals });
     } catch (error) {
       return response.badRequest(error);
@@ -617,7 +620,7 @@ export default class AdminsController {
         .preload("user")
         .preload("status_name")
         .preload("userAmount");
-        console.log(allWithdrawals)
+      console.log(allWithdrawals);
       return response.send({ message: allWithdrawals });
     } catch (error) {
       return response.badRequest(error);
@@ -631,7 +634,7 @@ export default class AdminsController {
         .preload("user")
         .preload("status_name")
         .preload("userAmount");
-        console.log(allWithdrawals)
+      console.log(allWithdrawals);
       return response.send({ message: allWithdrawals });
     } catch (error) {
       return response.badRequest(error);
@@ -686,15 +689,18 @@ export default class AdminsController {
     }
   }
 
-  public async manualWithdrawal({request, response}){
-  //  const {amount, account_number, bank_code, reference} = request.all()
+  public async manualWithdrawal({ request, response }) {
+    //  const {amount, account_number, bank_code, reference} = request.all()
     try {
       const withdrawReceipt = request.file("receipt", {
         size: "10mb",
         extnames: ["jpg", "png"],
       });
-      await cloudinary.upload(withdrawReceipt, withdrawReceipt.clientName)
-      const withdrawal = await UserWithdrawal.findByOrFail("id", request.input('id'));
+      await cloudinary.upload(withdrawReceipt, withdrawReceipt.clientName);
+      const withdrawal = await UserWithdrawal.findByOrFail(
+        "id",
+        request.input("id")
+      );
       await withdrawal?.load((loader) => {
         loader
           .load("account")
@@ -709,36 +715,33 @@ export default class AdminsController {
       );
       withdrawal.status = 4;
       withdrawal.receipt = withdrawReceipt.clientName;
-      withdrawal.completed = true
-      wallet.amount = `${Number(wallet.amount) - Number(withdrawal.amount)}`
+      withdrawal.completed = true;
+      wallet.amount = `${Number(wallet.amount) - Number(withdrawal.amount)}`;
       // console.log(wallet)
-      withdrawal.save()
-      wallet.save()
+      withdrawal.save();
+      wallet.save();
       const mailData = {
-        from: 'no-reply@ubycohubs.com',
+        from: "no-reply@ubycohubs.com",
         to: `${withdrawal.user.email}, ubycohub@gmail.com`,
         subject: `Withdrawal Completed`,
-        html:`${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful.`
-      }
+        html: `${withdrawal.user.email} request for a withdrwal of ${withdrawal.amount} was successful.`,
+      };
       await Helper.transporter.sendMail(mailData, (error: any) => {
         if (error) {
-      
           return response.badRequest(error.messages);
         }
       });
       return response.status(200);
+    } catch (error) {
+      console.log(error);
+      response.badRequest("something went wrong");
     }
-    catch (error) {
-      console.log(error)
-      response.badRequest('something went wrong')
-    }
-
   }
 
-  public async deleteUserAmount({request, response}){
-    const amount = await UserAmount.findByOrFail('id', request.input('id'))
-    amount.delete()
-    return response.status(200)
+  public async deleteUserAmount({ request, response }) {
+    const amount = await UserAmount.findByOrFail("id", request.input("id"));
+    amount.delete();
+    return response.status(200);
   }
 
   public async verifyWithdrawal({ request, response }) {
@@ -753,12 +756,17 @@ export default class AdminsController {
         .load("user")
         .load("userAmount");
     });
-    const userAmount = await UserAmount.findByOrFail('id', userWithdrawal.user_id)
+    const userAmount = await UserAmount.findByOrFail(
+      "id",
+      userWithdrawal.user_id
+    );
     // console.log(userAmount)
-    userAmount.amount = `${Number(userAmount.amount) - Number(userWithdrawal.amount)}`;
+    userAmount.amount = `${
+      Number(userAmount.amount) - Number(userWithdrawal.amount)
+    }`;
     userWithdrawal.status = 4;
     // userWithdrawal.receipt = withdrawReceipt.clientName;
-    userWithdrawal.completed = true
+    userWithdrawal.completed = true;
     userWithdrawal.save();
     userAmount.save();
     const verify = Helper.paystack.transaction.verify({
@@ -777,8 +785,8 @@ export default class AdminsController {
       request.input("id")
     );
     userWithdrawal.status = request.input("status");
-    console.log(userWithdrawal)
-    userWithdrawal.save()
+    console.log(userWithdrawal);
+    userWithdrawal.save();
     return response.send("Something Went wrong");
   }
   //subscriber
